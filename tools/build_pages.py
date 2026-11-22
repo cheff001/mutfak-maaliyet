@@ -20,6 +20,10 @@ def slug(t):
     for ch in fold(t): out += ch if ch.isalnum() and ch.isascii() else "-"
     while "--" in out: out = out.replace("--", "-")
     return out.strip("-")
+TRACK = '''<script>(function(){var U="https://ttpajmtrpdyrowkyjdlc.supabase.co",K="sb_publishable_g1P-Cwj5XyeQoSqzNJ0Jfg_dlCth701";
+function ref(){try{var h="";if(document.referrer){var u=new URL(document.referrer);if(u.host===location.host)return "direkt";h=u.host.toLowerCase()}var m=[["google","google"],["bing","bing"],["instagram","instagram"],["facebook","facebook"],["whatsapp","whatsapp"],["wa.me","whatsapp"],["twitter","twitter"],["t.co","twitter"],["youtube","youtube"],["youtu.be","youtube"],["tiktok","tiktok"]];for(var i=0;i<m.length;i++)if(h.indexOf(m[i][0])>-1)return m[i][1];return h?"diger":"direkt"}catch(e){return "direkt"}}
+function t(k,p){try{var s="mm_t_"+k+p;if(sessionStorage.getItem(s))return;sessionStorage.setItem(s,"1")}catch(e){}try{fetch(U+"/rest/v1/rpc/track_view",{method:"POST",keepalive:true,headers:{"Content-Type":"application/json",apikey:K,Authorization:"Bearer "+K},body:JSON.stringify({p_kind:k,p_path:p,p_ref:ref()})}).catch(function(){})}catch(e){}}
+t("__KIND__","__PATH__");var b=document.querySelector("a.btn");if(b)b.addEventListener("click",function(){t("cta","__PATH__")})})();</script>'''
 def esc(x): return html.escape(str(x), quote=True)
 def num(x):
     x = round(x, 1)
@@ -56,7 +60,7 @@ table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px 6px;
 .note{color:#5d7176;font-size:14px}.al{display:inline-block;background:#fbe3e1;color:#a3201b;border-radius:6px;padding:1px 8px;font-size:14px;font-weight:700;margin:2px 4px 2px 0}
 ul.l{list-style:none;padding:0;margin:0;columns:2;column-gap:20px}ul.l li{padding:4px 0;break-inside:avoid}@media(max-width:520px){ul.l{columns:1}}
 footer{color:#5d7176;font-size:13px;margin-top:20px}"""
-def page(title, desc, path, body, ld=None, depth=2):
+def page(title, desc, path, body, ld=None, depth=2, kind="recipe", tpath=""):
     up = "../" * depth
     url = f"{BASE}/{path}"
     j = f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>' if ld else ""
@@ -71,7 +75,7 @@ def page(title, desc, path, body, ld=None, depth=2):
 <style>{CSS}</style>{j}</head><body>
 <header class="top"><a href="{up}">Mutfak Maliyet</a></header><main>{body}
 <footer><p>Mutfak Maliyet, restoran ve kafeler için ücretsiz reçete ve porsiyon maliyeti hesaplayıcıdır. Uygulama geliştirme aşamasındadır, fiyatlar şimdilik örnektir.</p>
-<p><a href="{up}tarifler/">Tüm tarifler</a> · <a href="{up}">Uygulamayı aç</a></p></footer></main></body></html>"""
+<p><a href="{up}tarifler/">Tüm tarifler</a> · <a href="{up}">Uygulamayı aç</a></p></footer></main>{TRACK.replace("__KIND__", kind).replace("__PATH__", tpath)}</body></html>"""
 
 def write(path, content):
     full = os.path.join(ROOT, path)
@@ -103,13 +107,13 @@ for r in recipes:
         {"@type": "ListItem", "position": 3, "name": r["n"], "item": f"{BASE}/tarif/{r['s']}/"}]}
     title = f"{r['n']} maliyeti ve malzemeleri | Mutfak Maliyet"
     desc = f"{r['n']} için malzeme listesi, gramajlar ve alerjen bilgisi. Porsiyon maliyetini kendi fiyatlarınla ücretsiz hesapla."
-    write(f"tarif/{r['s']}/index.html", page(title, desc, f"tarif/{r['s']}/", body, ld))
+    write(f"tarif/{r['s']}/index.html", page(title, desc, f"tarif/{r['s']}/", body, ld, tpath=r["s"]))
     urls.append((f"tarif/{r['s']}/", "0.6"))
 
 for c, rs in cats.items():
     lis = "".join(f'<li><a href="../../tarif/{x["s"]}/">{esc(x["n"])}</a></li>' for x in rs)
     body = f'<p class="note"><a href="../../tarifler/">Tarifler</a></p><h1>{esc(c)} tarifleri ve maliyetleri</h1><p>{len(rs)} tarif. Birini seç, malzemeleri ve alerjenleri gör, maliyetini hesapla.</p><div class="card"><ul class="l">{lis}</ul></div>'
-    write(f"kategori/{slug(c)}/index.html", page(f"{c} tarifleri ve maliyetleri | Mutfak Maliyet", f"{c} kategorisinde {len(rs)} tarif: malzemeler, gramajlar, alerjenler ve porsiyon maliyeti hesaplama.", f"kategori/{slug(c)}/", body))
+    write(f"kategori/{slug(c)}/index.html", page(f"{c} tarifleri ve maliyetleri | Mutfak Maliyet", f"{c} kategorisinde {len(rs)} tarif: malzemeler, gramajlar, alerjenler ve porsiyon maliyeti hesaplama.", f"kategori/{slug(c)}/", body, kind="hub", tpath=f"kategori/{slug(c)}"))
     urls.append((f"kategori/{slug(c)}/", "0.7"))
 
 sec = ""
@@ -117,7 +121,7 @@ for c, rs in cats.items():
     lis = "".join(f'<li><a href="../tarif/{x["s"]}/">{esc(x["n"])}</a></li>' for x in rs)
     sec += f'<div class="card"><h2><a href="../kategori/{slug(c)}/">{esc(c)}</a> ({len(rs)})</h2><ul class="l">{lis}</ul></div>'
 body = f'<h1>Tüm tarifler ve maliyet hesabı</h1><p>{len(recipes)} tarifin malzeme listesi, gramajları ve alerjenleri. Her tarifin porsiyon maliyetini uygulamada kendi fiyatlarınla hesaplayabilirsin.</p><p><a class="btn" href="../?demo=1">Uygulamayı dene</a></p>{sec}'
-write("tarifler/index.html", page("Tüm tarifler ve maliyet hesabı | Mutfak Maliyet", f"{len(recipes)} tarifin malzemeleri, gramajları ve alerjenleri. Restoran ve kafe için porsiyon maliyeti hesaplayıcı.", "tarifler/", body, depth=1))
+write("tarifler/index.html", page("Tüm tarifler ve maliyet hesabı | Mutfak Maliyet", f"{len(recipes)} tarifin malzemeleri, gramajları ve alerjenleri. Restoran ve kafe için porsiyon maliyeti hesaplayıcı.", "tarifler/", body, depth=1, kind="hub", tpath="tarifler"))
 
 sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
 for u, pr in urls: sm += f"<url><loc>{BASE}/{u}</loc><lastmod>{TODAY}</lastmod><priority>{pr}</priority></url>\n"

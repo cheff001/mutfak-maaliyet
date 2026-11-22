@@ -172,6 +172,10 @@ textarea:focus{border-color:var(--acc)}
 .astat span{display:block;color:var(--mut);font-size:13px}
 .chk{display:flex;gap:10px;align-items:flex-start;margin:12px 0 0;font-weight:500;font-size:14px;color:var(--ink);cursor:pointer}
 .chk input{flex:0 0 22px;width:22px;height:22px;min-height:0;margin:1px 0 0;padding:0;accent-color:var(--acc)}
+.rvx{display:block;border-top:1px solid var(--line);padding:10px 0}.rvx:first-child{border-top:0}
+.rvx .rv1{display:block;font-weight:700}.rvx .rv2{display:block;color:var(--mut);font-size:14px}.rvx .rv3{display:block;font-size:13px;margin-top:2px}.rvx .rv3.warnc{color:var(--warn);font-weight:700}
+.rvx .rvb{display:flex;gap:8px;margin-top:8px}.rvx .rvb button{flex:1;min-height:44px;height:auto;width:auto}
+.tl{margin:10px 0 0;font-size:14px}.tl b{font-weight:700}.tl div{padding:2px 0}
 .gnwrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
 .gnsvg{width:100%;max-width:300px;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
 .gnsvg rect.cell{fill:var(--acc);fill-opacity:.18;stroke:var(--acc);stroke-width:2}
@@ -308,6 +312,12 @@ textarea:focus{border-color:var(--acc)}
 <h2>Yönetici özeti</h2>
 <p class="note" style="margin:0 0 8px">Bunu sadece sen görüyorsun.</p>
 <div class="stats" id="statGrid"></div>
+<div id="trafBox"></div>
+</section>
+<section class="card" id="repCard" hidden>
+<h2>Gelen fatura fiyatları</h2>
+<p class="note" style="margin:0 0 8px" id="repNote"></p>
+<div id="repList"></div>
 </section>
 <section class="card" id="bulkCard" hidden>
 <h2>Toplu fiyat girişi</h2>
@@ -632,6 +642,7 @@ var I={},CAMP={},LIVE={},HALD=null,MS={},MD={},PB={},MINH=7,ADMIN=false,editK=nu
 function lbl(s,n){return s==="Market"&&MS[n]?MS[n].store:s}
 var SB_URL="https://ttpajmtrpdyrowkyjdlc.supabase.co",SB_KEY="sb_publishable_g1P-Cwj5XyeQoSqzNJ0Jfg_dlCth701";
 var sb=supabase.createClient(SB_URL,SB_KEY,{auth:{flowType:"implicit"}});
+setTimeout(function(){if(!/[?&]tarif=/.test(location.search))track("app","")},0);
 var HOME=location.origin+location.pathname;
 var recovering=/type=recovery/.test(location.hash+location.search);
 var LPK="mm_prefs",LP={};try{LP=JSON.parse(localStorage.getItem(LPK))||{}}catch(e){}
@@ -718,7 +729,7 @@ catch(e){console.error(e);$("loading").textContent="Veriler yüklenemedi ("+e.me
 
 /* ---------- demo (girişsiz) ---------- */
 function exitGuest(){guest=false;document.body.classList.remove("guest");I={};CAMP={};LIVE={};HALD=null;MS={};MD={};PB={};store={shops:[],recipes:[],fav:[]};rebuildR();calc=null;curShop=null;$("gq").value="";showAuth()}
-async function loadGuest(){guest=true;document.body.classList.add("guest");$("authView").hidden=true;$("app").hidden=true;$("bnav").hidden=true;$("loading").hidden=false;$("loading").textContent="Yükleniyor…";
+async function loadGuest(){track("demo","");guest=true;document.body.classList.add("guest");$("authView").hidden=true;$("app").hidden=true;$("bnav").hidden=true;$("loading").hidden=false;$("loading").textContent="Yükleniyor…";
 try{var r=await sb.from("prices").select("*");if(r.error)throw r.error;if(!r.data||!r.data.length)throw new Error("fiyat listesi boş");
 I={};CAMP={};LIVE={};HALD=null;MS={};MD={};PB={};store={shops:[],recipes:[],fav:[]};
 BASEK={};r.data.forEach(function(p){BASEK[p.ingredient]=p.unit;I[p.ingredient]=[p.unit,[num(p.hal),num(p.metro),num(p.market)]];if(p.metro_date&&p.metro!=null)MD[p.ingredient]=p.metro_date;if(p.market_store&&p.market!=null)MS[p.ingredient]={store:p.market_store,date:p.market_date};if(p.campaign)CAMP[p.ingredient]=p.campaign;if(p.hal_date){LIVE[p.ingredient]=1;if(!HALD||p.hal_date>HALD)HALD=p.hal_date}});
@@ -795,9 +806,9 @@ function loadProdN(){if(!ADMIN||guest||prodLoading)return;prodLoading=true;sb.rp
 function drawStats(){var c=$("adminStat");c.hidden=!ADMIN;if(!ADMIN)return;
 var keys=Object.keys(I).filter(function(k){return !I[k][2]}),n=keys.length,vm=keys.filter(function(k){return MD[k]}).length,vk=keys.filter(function(k){return MS[k]}).length,vh=keys.filter(function(k){return LIVE[k]}).length;
 var rec=BASE.length,cats={};BASE.forEach(function(r){cats[r.c]=1});
-var rows=[[n,"ürün (malzeme)"],[rec,"hazır tarif, "+Object.keys(cats).length+" kategori"],[vm+vk+vh,"doğrulanmış fiyat (Metro "+vm+", market "+vk+", hâl "+vh+")"],[PRODN==null?"…":PRODN,"markalı ürün kaydı"]];if(USTAT){rows.push([USTAT.users,"kayıtlı kullanıcı"],[USTAT.new_today+" / "+USTAT.new_7d,"yeni kayıt (bugün / son 7 gün)"],[USTAT.active_7d,"son 7 günde giriş yapan"],[USTAT.shops+" / "+USTAT.own_recipes,"kaydedilen işletme / kendi tarifi"])}else rows.push(["…","kullanıcı sayıları yükleniyor"]);
+var rows=[[n,"ürün (malzeme)"],[rec,"hazır tarif, "+Object.keys(cats).length+" kategori"],[vm+vk+vh,"doğrulanmış fiyat (Metro "+vm+", market "+vk+", hâl "+vh+")"],[PRODN==null?"…":PRODN,"markalı ürün kaydı"]];if(USTAT){rows.push([USTAT.users,"kayıtlı kullanıcı"],[USTAT.new_today+" / "+USTAT.new_7d,"yeni kayıt (bugün / son 7 gün)"],[USTAT.active_7d,"son 7 günde giriş yapan"],[USTAT.shops+" / "+USTAT.own_recipes,"kaydedilen işletme / kendi tarifi"])}else rows.push(["…","kullanıcı sayıları yükleniyor"]);if(USTAT)rows.push([USTAT.reports_pending,"onay bekleyen fatura fiyatı (toplam gelen "+USTAT.reports+")"]);
 var g=$("statGrid");g.innerHTML="";rows.forEach(function(r){var d=document.createElement("div");d.className="astat";var b=document.createElement("b");b.textContent=r[0];var sp=document.createElement("span");sp.textContent=r[1];d.appendChild(b);d.appendChild(sp);g.appendChild(d)});
-if(PRODN==null)loadProdN()}
+if(PRODN==null)loadProdN();if(TRAF==null)loadTraf();else drawTraf()}
 
 /* ---------- KENDİ FATURAMDAN FİYAT ---------- */
 function slugify(t){return fold(t).replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")}
@@ -826,6 +837,41 @@ if(share){var r=await sb.rpc("submit_price",{p_ingredient:k,p_brand:brand||null,
 out.textContent=msg;$("fpPrice").value="";$("fpQty").value="";$("fpBrand").value="";$("fpIng").value="";drawPrices()}catch(e){fail(e)}})};
 function deepLink(){var m=location.search.match(/[?&]tarif=([^&]+)/);if(!m||deepLink.done)return;deepLink.done=1;var sl;try{sl=decodeURIComponent(m[1])}catch(e){return}
 var i=R.findIndex(function(r){return slugify(r.n)===sl});if(i>-1){go("calc");openRecipe(i)}}
+
+/* ---------- SAYAÇ (çerezsiz, kişi bilgisi tutmaz) ---------- */
+function refName(){try{var q=(location.search.match(/[?&](?:utm_source|ref)=([^&]+)/)||[])[1];var h=q?decodeURIComponent(q).toLowerCase():"";if(!h&&document.referrer){var u=new URL(document.referrer);if(u.host===location.host)return "direkt";h=u.host.toLowerCase()}
+var m=[["google","google"],["bing","bing"],["instagram","instagram"],["facebook","facebook"],["fb.","facebook"],["whatsapp","whatsapp"],["wa.me","whatsapp"],["twitter","twitter"],["t.co","twitter"],["youtube","youtube"],["youtu.be","youtube"],["tiktok","tiktok"]];
+for(var i=0;i<m.length;i++)if(h.indexOf(m[i][0])>-1)return m[i][1];return h?"diger":"direkt"}catch(e){return "direkt"}}
+function track(kind,path){try{var k="mm_t_"+kind+(path||"");if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1")}catch(e){}
+try{sb.rpc("track_view",{p_kind:kind,p_path:path||"",p_ref:refName()}).then(function(){},function(){})}catch(e){}}
+/* ---------- GELEN FATURA FİYATLARI (yönetici) ---------- */
+var REPS=null,repLoading=false,TRAF=null;
+function loadReps(){if(!ADMIN||guest||repLoading)return;repLoading=true;
+sb.from("price_reports").select("*").eq("status","pending").order("created_at",{ascending:false}).limit(100).then(function(r){repLoading=false;if(r.error){REPS=[];console.warn(r.error);return}REPS=r.data||[];drawRep()},function(){repLoading=false})}
+function drawRep(){var c=$("repCard");c.hidden=!ADMIN;if(!ADMIN)return;if(REPS==null){loadReps();$("repNote").textContent="Yükleniyor…";return}
+var l=$("repList");l.innerHTML="";$("repNote").textContent=REPS.length?REPS.length+" fiyat onay bekliyor. Onayladığın fiyat ürün fiyatlarına işlenir (Metro ise Metro, değilse market olarak, mağaza adıyla).":"Bekleyen fiyat yok. Kullanıcılar fatura fiyatı paylaşınca burada görünür.";
+REPS.forEach(function(r){var up=+r.unit_price,cur=I[r.ingredient]&&I[r.ingredient][1],ref=cur&&(/metro/i.test(r.store)?cur[1]:cur[2]),same=REPS.filter(function(o){return o.id!==r.id&&o.ingredient===r.ingredient&&Math.abs(+o.unit_price-up)/up<=0.15}).length;
+var d=document.createElement("div");d.className="rvx";
+d.innerHTML='<span class="rv1"></span><span class="rv2"></span><span class="rv3"></span><div class="rvb"><button class="go ok">Onayla</button><button class="ghost no">Reddet</button></div>';
+d.querySelector(".rv1").textContent=(r.brand?r.brand+" ":"")+r.ingredient+": "+tl(+r.price)+" / "+num(+r.pack_qty)+" "+(I[r.ingredient]?I[r.ingredient][0]:"")+" = "+tl(up)+"/"+(I[r.ingredient]?I[r.ingredient][0]:"");
+d.querySelector(".rv2").textContent=r.store+" · fatura "+r.invoice_date.split("-").reverse().join(".")+" · "+(r.user_id?"kayıtlı kullanıcı":"demo kullanıcı");
+var t3=d.querySelector(".rv3"),ratio=ref?up/ref:null,txt=[];
+if(ratio){txt.push("Listedeki fiyata göre "+(ratio>=1?"%"+Math.round((ratio-1)*100)+" yüksek":"%"+Math.round((1-ratio)*100)+" düşük"));if(ratio>3||ratio<0.33)t3.className="rv3 warnc"}
+if(same)txt.push(same+" kişi daha benzer fiyat girdi");t3.textContent=txt.join(" · ");
+function act(ok){var b1=d.querySelector(".ok"),b2=d.querySelector(".no");b1.disabled=b2.disabled=true;
+sb.rpc("admin_review_report",{p_id:r.id,p_ok:ok}).then(function(x){if(x.error){b1.disabled=b2.disabled=false;toast("Hata: "+x.error.message);return}
+REPS=REPS.filter(function(o){return o.id!==r.id});USTAT=null;
+if(ok)sb.from("prices").select("*").eq("ingredient",r.ingredient).then(function(g){if(g.data)g.data.forEach(function(p){if(I[p.ingredient]&&I[p.ingredient][2])return;I[p.ingredient]=[p.unit,[num(p.hal),num(p.metro),num(p.market)]];if(p.metro_date&&p.metro!=null)MD[p.ingredient]=p.metro_date;if(p.market_store&&p.market!=null)MS[p.ingredient]={store:p.market_store,date:p.market_date}});drawPrices()});
+toast(ok?"Onaylandı.":"Reddedildi.");drawRep();drawStats()})}
+d.querySelector(".ok").onclick=function(){act(true)};d.querySelector(".no").onclick=function(){act(false)};l.appendChild(d)})}
+function drawTraf(){var b=$("trafBox");b.innerHTML="";if(!TRAF)return;var g=function(o,k){return (o&&o[k])||0};
+var rows=[["Uygulama açılışı",["app"]],["Demo başlatan",["demo"]],["Tarif sayfası görüntüleme",["recipe","hub"]],["Tarif sayfasından uygulamaya geçen",["cta"]]];
+var h=document.createElement("div");h.className="tl";var t=document.createElement("b");t.textContent="Ziyaret (bugün / 7 gün / 30 gün)";h.appendChild(t);
+rows.forEach(function(r){var s=function(o){return r[1].reduce(function(a,k){return a+g(o,k)},0)};var d=document.createElement("div");d.textContent=r[0]+": "+s(TRAF.today)+" / "+s(TRAF.d7)+" / "+s(TRAF.d30);h.appendChild(d)});
+if(TRAF.refs&&TRAF.refs.length){var d=document.createElement("div");d.textContent="Kaynaklar (30 gün): "+TRAF.refs.map(function(x){return x.ref+" "+x.n}).join(", ");h.appendChild(d)}
+if(TRAF.top&&TRAF.top.length){var d2=document.createElement("div");d2.textContent="En çok bakılan tarifler (30 gün): "+TRAF.top.map(function(x){return x.path+" "+x.n}).join(", ");h.appendChild(d2)}
+var note=document.createElement("div");note.className="note";note.textContent="Sayaç oturum başına bir kez sayar, kişi ya da cihaz kaydı tutmaz.";h.appendChild(note);b.appendChild(h)}
+function loadTraf(){if(!ADMIN||guest)return;sb.rpc("admin_traffic").then(function(r){if(!r.error&&r.data){TRAF=r.data;drawTraf()}})}
 function draw(){drawSources();if(tab==="profile")drawProfile();else if(tab==="calc")drawCalc();else if(tab==="price")drawPrices();else if(tab==="rec")drawRecs();else if(tab==="guide")drawGuide();else if(curShop)drawShop();else drawLib()}
 function halAge(){return HALD?Math.max(0,Math.floor((Date.now()-new Date(HALD).getTime())/864e5)):0}
 function drawSources(){var hw=$("halWarn");if(hw){var ag=halAge();hw.hidden=!(sel["Hâl"]&&HALD&&ag>7);hw.textContent="Dikkat: hâl fiyatları "+ag+" gün önceki veri. Bursa Belediyesi hâl verisini güncellemedi, maliyet eski fiyatla hesaplanıyor."}["srcCalc","srcPrice"].forEach(function(id){var el=$(id);el.innerHTML="";S.forEach(function(s){var b=document.createElement("button");b.className="chip";b.textContent=s;b.setAttribute("aria-pressed",!!sel[s]);b.onclick=function(){sel[s]=!sel[s];savePrefs();draw()};el.appendChild(b)})})}
@@ -916,7 +962,7 @@ return md+" Market sütunundaki mağaza adlı fiyatlar ("+Object.keys(st).join("
 function drawHalNote(){var el=$("halNote");if(!HALD){el.textContent="Fiyatlar şimdilik örnek veridir."+mNote();return}
 el.innerHTML='Yeşil işaretli hâl fiyatları <a href="https://acikyesil.bursa.bel.tr/dataset/hal-fiyatlari" target="_blank" rel="noopener">Bursa Büyükşehir Belediyesi Açık Veri Platformu</a>\'ndan, <a href="https://acikyesil.bursa.bel.tr/license" target="_blank" rel="noopener">Bursa Açık Veri Lisansı</a> ile alınır (min ve max fiyatın ortalaması). Hâl verisinin tarihi: <b></b>. Diğer fiyatlar şimdilik örnektir.'+mNote();
 el.querySelector("b").textContent=dt(HALD);var ag=halAge();if(ag>7)el.insertAdjacentHTML("beforeend",' <b style="color:var(--warn)">Dikkat: bu veri '+ag+' gün önceki, Bursa Belediyesi hâl verisini güncellemedi. Hâl fiyatları güncel olmayabilir.</b>')}
-function drawPrices(){drawHalNote();drawFp();$("bulkCard").hidden=!ADMIN;drawStats();var fl=["Tümü","Takip ettiklerin","Zamlananlar","Kampanyalı"],pf=$("pf");pf.innerHTML="";
+function drawPrices(){drawHalNote();drawFp();drawRep();$("bulkCard").hidden=!ADMIN;drawStats();var fl=["Tümü","Takip ettiklerin","Zamlananlar","Kampanyalı"],pf=$("pf");pf.innerHTML="";
 fl.forEach(function(x){var b=document.createElement("button");b.className="chip";b.textContent=x;b.setAttribute("aria-pressed",x===pfil);b.onclick=function(){pfil=x;drawPrices()};pf.appendChild(b)});
 var f=fold(gqv().trim()),keys=Object.keys(I).filter(function(k){if(f&&sScore(k,f)<0)return false;if(pfil==="Takip ettiklerin")return store.fav.indexOf(k)>-1;if(pfil==="Zamlananlar"){var cz=chg(k);return cz!=null&&cz>=20}if(pfil==="Kampanyalı")return !!CAMP[k];return true});
 keys.sort(function(a,b){var fa=store.fav.indexOf(a)>-1,fb=store.fav.indexOf(b)>-1;if(fa!==fb)return fa?-1:1;return a.localeCompare(b,"tr")});
@@ -986,7 +1032,7 @@ busy(btn,async function(){try{var rows=bulkRows.map(function(o){return{ingredien
 var r=await sb.rpc("bulk_price_save",{p_source:src,p_store:store,p_rows:rows});if(r.error)throw r.error;
 var ks=bulkRows.map(function(o){return o.k}),g=await sb.from("prices").select("*").in("ingredient",ks);
 if(g.data)g.data.forEach(function(p){I[p.ingredient]=[p.unit,[num(p.hal),num(p.metro),num(p.market)]];if(p.metro_date&&p.metro!=null)MD[p.ingredient]=p.metro_date;if(p.market_store&&p.market!=null)MS[p.ingredient]={store:p.market_store,date:p.market_date}});
-PRODN=null;USTAT=null;toast(r.data+" fiyat kaydedildi.");$("bkText").value="";$("bkOut").innerHTML="";bulkRows=[];btn.disabled=true;drawPrices()}
+PRODN=null;USTAT=null;TRAF=null;toast(r.data+" fiyat kaydedildi.");$("bkText").value="";$("bkOut").innerHTML="";bulkRows=[];btn.disabled=true;drawPrices()}
 catch(e){fail(e)}})};
 
 /* ---------- TARİFLER ---------- */
