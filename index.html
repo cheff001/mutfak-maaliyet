@@ -768,12 +768,12 @@ ps[3].textContent=ings.length?"Listedeki malzemelerden içerenler: "+ings.join("
 ps[4].textContent=inR+" / "+tot+" klasik tarifte bu alerjen var."}
 
 /* ---------- YÖNETİCİ ÖZETİ ---------- */
-var PRODN=null,prodLoading=false;
-function loadProdN(){if(!ADMIN||guest||prodLoading)return;prodLoading=true;sb.from("products").select("id",{count:"exact",head:true}).then(function(r){prodLoading=false;if(!r.error&&r.count!=null){PRODN=r.count;drawStats()}},function(){prodLoading=false})}
+var PRODN=null,prodLoading=false,USTAT=null;
+function loadProdN(){if(!ADMIN||guest||prodLoading)return;prodLoading=true;sb.rpc("admin_stats").then(function(r){if(!r.error&&r.data){USTAT=r.data;drawStats()}});sb.from("products").select("id",{count:"exact",head:true}).then(function(r){prodLoading=false;if(!r.error&&r.count!=null){PRODN=r.count;drawStats()}},function(){prodLoading=false})}
 function drawStats(){var c=$("adminStat");c.hidden=!ADMIN;if(!ADMIN)return;
 var keys=Object.keys(I).filter(function(k){return !I[k][2]}),n=keys.length,vm=keys.filter(function(k){return MD[k]}).length,vk=keys.filter(function(k){return MS[k]}).length,vh=keys.filter(function(k){return LIVE[k]}).length;
 var rec=BASE.length,cats={};BASE.forEach(function(r){cats[r.c]=1});
-var rows=[[n,"ürün (malzeme)"],[rec,"hazır tarif, "+Object.keys(cats).length+" kategori"],[vm+vk+vh,"doğrulanmış fiyat (Metro "+vm+", market "+vk+", hâl "+vh+")"],[PRODN==null?"…":PRODN,"markalı ürün kaydı"]];
+var rows=[[n,"ürün (malzeme)"],[rec,"hazır tarif, "+Object.keys(cats).length+" kategori"],[vm+vk+vh,"doğrulanmış fiyat (Metro "+vm+", market "+vk+", hâl "+vh+")"],[PRODN==null?"…":PRODN,"markalı ürün kaydı"]];if(USTAT){rows.push([USTAT.users,"kayıtlı kullanıcı"],[USTAT.new_today+" / "+USTAT.new_7d,"yeni kayıt (bugün / son 7 gün)"],[USTAT.active_7d,"son 7 günde giriş yapan"],[USTAT.shops+" / "+USTAT.own_recipes,"kaydedilen işletme / kendi tarifi"])}else rows.push(["…","kullanıcı sayıları yükleniyor"]);
 var g=$("statGrid");g.innerHTML="";rows.forEach(function(r){var d=document.createElement("div");d.className="astat";var b=document.createElement("b");b.textContent=r[0];var sp=document.createElement("span");sp.textContent=r[1];d.appendChild(b);d.appendChild(sp);g.appendChild(d)});
 if(PRODN==null)loadProdN()}
 function draw(){drawSources();if(tab==="profile")drawProfile();else if(tab==="calc")drawCalc();else if(tab==="price")drawPrices();else if(tab==="rec")drawRecs();else if(tab==="guide")drawGuide();else if(curShop)drawShop();else drawLib()}
@@ -936,7 +936,7 @@ busy(btn,async function(){try{var rows=bulkRows.map(function(o){return{ingredien
 var r=await sb.rpc("bulk_price_save",{p_source:src,p_store:store,p_rows:rows});if(r.error)throw r.error;
 var ks=bulkRows.map(function(o){return o.k}),g=await sb.from("prices").select("*").in("ingredient",ks);
 if(g.data)g.data.forEach(function(p){I[p.ingredient]=[p.unit,[num(p.hal),num(p.metro),num(p.market)]];if(p.metro_date&&p.metro!=null)MD[p.ingredient]=p.metro_date;if(p.market_store&&p.market!=null)MS[p.ingredient]={store:p.market_store,date:p.market_date}});
-PRODN=null;toast(r.data+" fiyat kaydedildi.");$("bkText").value="";$("bkOut").innerHTML="";bulkRows=[];btn.disabled=true;drawPrices()}
+PRODN=null;USTAT=null;toast(r.data+" fiyat kaydedildi.");$("bkText").value="";$("bkOut").innerHTML="";bulkRows=[];btn.disabled=true;drawPrices()}
 catch(e){fail(e)}})};
 
 /* ---------- TARİFLER ---------- */
