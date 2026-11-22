@@ -272,6 +272,7 @@ textarea:focus{border-color:var(--acc)}
 <div style="margin-top:12px">
 <div class="line"><span>Porsiyon maliyeti</span><b id="pc">0,00 ₺</b></div>
 <div class="line hl"><span>Önerilen satış fiyatı</span><b id="sp">0,00 ₺</b></div>
+<div class="line"><span>Toplam kâr</span><b id="tp">0,00 ₺</b></div>
 <div class="line"><span id="oldL">Fiyat değişimi</span><b id="old">—</b></div>
 <div class="note" id="drivers"></div>
 </div>
@@ -936,7 +937,7 @@ if(!ks.length){box.hidden=true;return}box.hidden=false;box.innerHTML='<p class="
 var l=box.querySelector(".lst");ks.forEach(function(a){var d=document.createElement("div");d.className="al";var b=document.createElement("b");b.textContent=a[1]+": ";d.appendChild(b);d.appendChild(document.createTextNode(by[a[0]].join(", ")));l.appendChild(d)});
 box.querySelector(".nt").textContent="Sade ürünlere göre. Hazır ürünlerde (bulyon, sos, çikolata, bisküvi) etiketi kontrol et."+(own?" Kendi eklediğin malzemeler kontrol edilmedi.":"")}
 function totals(){var s=sum(items),mar=marg(),p=Math.max(1,+$("por").value||1);
-$("total").textContent=tl(s.t);$("pc").textContent=tl(s.t/p);$("sp").textContent=tl((s.t/p)/(1-mar/100));
+$("total").textContent=tl(s.t);$("pc").textContent=tl(s.t/p);$("sp").textContent=tl((s.t/p)/(1-mar/100));$("tp").textContent=tl(s.t/(1-mar/100)-s.t);
 var d=s.t-s.all;$("save").hidden=!(d>0.5);if(d>0.5)$("save").textContent="Tüm kaynaklardan en ucuzunu seçersen "+tl(d)+" daha az öder, maliyet "+tl(s.all)+" olur.";
 $("miss").hidden=!s.miss;if(s.miss)$("miss").textContent=s.miss+" malzemenin fiyatı seçili kaynaklarda yok, toplam eksik. Başka bir kaynak seç.";
 var t=trend(items);
