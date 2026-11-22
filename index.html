@@ -296,6 +296,11 @@ textarea:focus{border-color:var(--acc)}
 <div class="chips" id="srcPrice"></div>
 <p class="note">Seçtiğin kaynaklar arasındaki en ucuz fiyat hesaplarda kullanılır.</p>
 <p class="note" id="halNote"></p>
+<section class="card" id="zamCard">
+<h2>Zam uyarıları <span class="meta" style="font-weight:700;border:1px solid var(--line);border-radius:8px;padding:1px 7px;margin-left:6px">Pro ön izleme</span></h2>
+<p class="note" style="margin:0 0 8px" id="zamNote">Yükleniyor…</p>
+<div id="zamList"></div>
+</section>
 </section>
 <section class="card" id="fpCard" hidden>
 <h2>Kendi faturandan fiyat gir</h2>
@@ -964,10 +969,21 @@ function chg(n){var d=I[n],pb=PB[n];if(!d||d[2]||!pb||days(n)<MINH)return null;f
 function mdNote(){var ks=Object.keys(MD);if(!ks.length)return"";var last=ks.reduce(function(a,k){return !a||MD[k]>a?MD[k]:a},null);return" ✓ işaretli Metro fiyatları ("+ks.length+" ürün) mağazadan elle kontrol edilerek girilmiştir, son kontrol: "+dt(last)+".";}
 function mNote(){var md=mdNote();var ks=Object.keys(MS);if(!ks.length)return md;var st={},last=null;ks.forEach(function(k){st[MS[k].store]=1;if(MS[k].date&&(!last||MS[k].date>last))last=MS[k].date});
 return md+" Market sütunundaki mağaza adlı fiyatlar ("+Object.keys(st).join(", ")+") mağaza rafından elle kontrol edilerek girilmiştir"+(last?", son kontrol: "+dt(last):"")+".";}
+var ZAM=null,zamLoading=false;
+function loadZam(){if(zamLoading)return;zamLoading=true;sb.rpc("price_changes",{p_days:7,p_min:5}).then(function(r){zamLoading=false;ZAM=r.error?[]:(r.data||[]);drawZam()})}
+function drawZam(){var c=$("zamCard");if(!c)return;if(ZAM==null){loadZam();return}var l=$("zamList");l.innerHTML="";
+if(!ZAM.length){$("zamNote").textContent="Son 7 günde yüzde 5'ten büyük fiyat değişimi yok. Fiyat geçmişi biriktikçe zam ve indirimler burada görünür.";return}
+$("zamNote").textContent="Son 7 günde yüzde 5 ya da daha fazla değişen malzemeler ve etkilenen tarifler.";
+var SN={hal:"Hâl",metro:"Metro",market:"Market"};
+ZAM.forEach(function(z){var n=R.filter(function(r){return r.it.some(function(x){return x.n===z.ingredient})}).length;var up=z.pct>0;
+var d=document.createElement("div");d.className="zmrow";d.style.cssText="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line)";
+var a=document.createElement("div");var t=document.createElement("b");t.textContent=z.ingredient;var m=document.createElement("div");m.className="meta";m.textContent=(SN[z.source]||z.source)+" · "+n+" tarifi etkiliyor";a.appendChild(t);a.appendChild(m);
+var b=document.createElement("div");b.style.cssText="text-align:right;font-weight:800;color:"+(up?"#b3261e":"#1b7a3d");b.textContent=(up?"+":"")+String(z.pct).replace(".",",")+"%";var m2=document.createElement("div");m2.className="meta";m2.style.fontWeight="400";m2.textContent=String(z.old_price).replace(".",",")+" → "+String(z.new_price).replace(".",",")+" TL";b.appendChild(m2);
+d.appendChild(a);d.appendChild(b);l.appendChild(d)})}
 function drawHalNote(){var el=$("halNote");if(!HALD){el.textContent="Fiyatlar şimdilik örnek veridir."+mNote();return}
 el.innerHTML='Yeşil işaretli hâl fiyatları <a href="https://acikyesil.bursa.bel.tr/dataset/hal-fiyatlari" target="_blank" rel="noopener">Bursa Büyükşehir Belediyesi Açık Veri Platformu</a>\'ndan, <a href="https://acikyesil.bursa.bel.tr/license" target="_blank" rel="noopener">Bursa Açık Veri Lisansı</a> ile alınır (min ve max fiyatın ortalaması). Hâl verisinin tarihi: <b></b>. Diğer fiyatlar şimdilik örnektir.'+mNote();
 el.querySelector("b").textContent=dt(HALD);var ag=halAge();if(ag>7)el.insertAdjacentHTML("beforeend",' <b style="color:var(--warn)">Dikkat: bu veri '+ag+' gün önceki, Bursa Belediyesi hâl verisini güncellemedi. Hâl fiyatları güncel olmayabilir.</b>')}
-function drawPrices(){drawHalNote();drawFp();drawRep();$("bulkCard").hidden=!ADMIN;var fl=["Tümü","Takip ettiklerin","Zamlananlar","Kampanyalı"],pf=$("pf");pf.innerHTML="";
+function drawPrices(){drawHalNote();drawZam();drawFp();drawRep();$("bulkCard").hidden=!ADMIN;var fl=["Tümü","Takip ettiklerin","Zamlananlar","Kampanyalı"],pf=$("pf");pf.innerHTML="";
 fl.forEach(function(x){var b=document.createElement("button");b.className="chip";b.textContent=x;b.setAttribute("aria-pressed",x===pfil);b.onclick=function(){pfil=x;drawPrices()};pf.appendChild(b)});
 var f=fold(gqv().trim()),keys=Object.keys(I).filter(function(k){if(f&&sScore(k,f)<0)return false;if(pfil==="Takip ettiklerin")return store.fav.indexOf(k)>-1;if(pfil==="Zamlananlar"){var cz=chg(k);return cz!=null&&cz>=20}if(pfil==="Kampanyalı")return !!CAMP[k];return true});
 keys.sort(function(a,b){var fa=store.fav.indexOf(a)>-1,fb=store.fav.indexOf(b)>-1;if(fa!==fb)return fa?-1:1;return a.localeCompare(b,"tr")});
