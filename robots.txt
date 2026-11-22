@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cheff001.github.io/mutfak-maaliyet/sitemap.xml
