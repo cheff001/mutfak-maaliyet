@@ -454,6 +454,12 @@ function rebuildR(){R=BASE.slice();store.recipes.forEach(function(r){R.push({c:"
 var $=function(id){return document.getElementById(id)};
 function tl(x){return x.toLocaleString("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2})+" ₺"}
 function fold(s){return s.toLocaleLowerCase("tr").replace(/ı/g,"i").replace(/ş/g,"s").replace(/ğ/g,"g").replace(/ü/g,"u").replace(/ö/g,"o").replace(/ç/g,"c").replace(/â/g,"a").replace(/î/g,"i")}
+
+var AL={"Ayçiçek yağı":"yudum komili orkide sıvı yağ kızartma yağı bitkisel yağ","Zeytinyağı":"komili kristal riviera sızma natürel zeytin yağı","Tereyağı":"sütaş pınar torku tereyağ yağ","Süt":"pınar sütaş içim günlük uht","Yoğurt":"sütaş pınar süzme","Un":"söke bizim ova buğday unu","Makarna":"filiz nuh barilla spagetti penne burgu","Pirinç":"baldo osmancık yerli pirinç","Şeker":"toz şeker kesme şeker","Salça":"tat tamek domates salçası","Biber salçası":"tat tamek acı tatlı","Yumurta":"yumurta boy m l tavuk yumurtası","Kaşar":"kaşar peyniri taze eski","Beyaz peynir":"sütaş pınar tam yağlı","Tavuk göğüs":"piliç göğüs fileto","Tavuk but":"piliç but baget","Dana kıyma":"kıyma dana kıyması","Mayonez":"calve hellmann's","Ketçap":"heinz tat","Kahve":"nescafe kurukahveci mehmet efendi türk kahvesi filtre","Nohut":"baklagil","Kuru fasulye":"baklagil","Sirke":"üzüm sirkesi elma sirkesi","Karabiber":"baharat","Pul biber":"baharat acı","Kimyon":"baharat","Tuz":"sofra tuzu kaya tuzu","Krema":"süt kreması şef krema","Mantar":"kültür mantarı","Soğan":"kuru soğan","Domates":"salkım","Patates":"kızartmalık"};
+function lev(a,b){var m=a.length,n=b.length,d=[],i,j;for(i=0;i<=m;i++){d[i]=[i]}for(j=1;j<=n;j++)d[0][j]=j;for(i=1;i<=m;i++)for(j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n]}
+/* arama: -1 eşleşme yok, düşük sayı daha iyi eşleşme. Ad, takma ad/marka ve yazım hatası toleransı. */
+function sScore(k,f){if(!f)return 0;var nm=fold(k);var ni=nm.indexOf(f);if(ni>-1)return ni;var hay=nm+" "+fold(AL[k]||"");if((" "+hay).indexOf(" "+f)>-1)return 50;var qt=f.split(/\s+/).filter(Boolean),ht=hay.split(/\s+/).filter(Boolean),tot=0;
+for(var i=0;i<qt.length;i++){var q=qt[i],best=99;for(var j=0;j<ht.length;j++){var t=ht[j];if(t.indexOf(q)===0){best=0;break}if(q.length<3)continue;var lim=q.length>=7?2:1;var e=Math.min(lev(q,t),t.length>q.length?lev(q,t.slice(0,q.length)):99);if(e<=lim&&e<best)best=e}if(best===99)return -1;tot+=best}return 100+tot}
 function cap(s){return s.charAt(0).toLocaleUpperCase("tr")+s.slice(1)}
 function num(x){return x==null?null:+x}
 function best(n,all){var d=I[n];if(!d)return null;if(d[2])return{s:"Kendi fiyatın",p:d[1][0],own:1};var b=null;S.forEach(function(s,k){if(d[1][k]==null)return;if(!all&&!sel[s])return;if(!b||d[1][k]<b.p)b={s:lbl(s,n),k:s,p:d[1][k]}});return b}
@@ -597,7 +603,7 @@ $("drivers").textContent=dr.length?"En çok zamlanan: "+dr.map(function(x){retur
 document.querySelectorAll("#rows .row").forEach(function(r,i){var it=items[i],b=best(it.n,false);r.querySelector(".price").textContent=b?tl(cost(it.n,it.a,b)):"—"})}
 function resetAdd(){pick=null;$("iq").value="";$("isug").innerHTML="";$("amtBox").hidden=true;$("newIng").hidden=true}
 function drawSug(){var qs=$("iq").value.trim(),f=fold(qs),el=$("isug");el.innerHTML="";$("newIng").hidden=true;$("amtBox").hidden=true;pick=null;if(!qs)return;
-var m=Object.keys(I).filter(function(k){return fold(k).indexOf(f)>-1}).sort(function(a,b){return fold(a).indexOf(f)-fold(b).indexOf(f)}).slice(0,6);
+var m=Object.keys(I).filter(function(k){return sScore(k,f)>-1}).sort(function(a,b){return sScore(a,f)-sScore(b,f)}).slice(0,6);
 var box=document.createElement("div");box.className="sug";
 m.forEach(function(k){var b=document.createElement("button"),bb=best(k,false);b.innerHTML='<span></span><span class="meta"></span>';b.firstChild.textContent=k;b.lastChild.textContent=bb?tl(bb.p)+"/"+I[k][0]:"seçili kaynakta yok";b.onclick=function(){choose(k)};box.appendChild(b)});
 var exact=m.some(function(k){return fold(k)===f});clearTimeout(missT);if(!m.length)missT=setTimeout(function(){logMiss(qs,"malzeme")},1500);
@@ -625,7 +631,7 @@ el.innerHTML='Yeşil işaretli hâl fiyatları <a href="https://acikyesil.bursa.
 el.querySelector("b").textContent=dt(HALD);var ag=halAge();if(ag>7)el.insertAdjacentHTML("beforeend",' <b style="color:var(--warn)">Dikkat: bu veri '+ag+' gün önceki, Bursa Belediyesi hâl verisini güncellemedi. Hâl fiyatları güncel olmayabilir.</b>')}
 function drawPrices(){drawHalNote();$("bulkCard").hidden=!ADMIN;var fl=["Tümü","Takip ettiklerin","Zamlananlar","Kampanyalı"],pf=$("pf");pf.innerHTML="";
 fl.forEach(function(x){var b=document.createElement("button");b.className="chip";b.textContent=x;b.setAttribute("aria-pressed",x===pfil);b.onclick=function(){pfil=x;drawPrices()};pf.appendChild(b)});
-var f=fold(gqv().trim()),keys=Object.keys(I).filter(function(k){if(f&&fold(k).indexOf(f)<0)return false;if(pfil==="Takip ettiklerin")return store.fav.indexOf(k)>-1;if(pfil==="Zamlananlar"){var cz=chg(k);return cz!=null&&cz>=20}if(pfil==="Kampanyalı")return !!CAMP[k];return true});
+var f=fold(gqv().trim()),keys=Object.keys(I).filter(function(k){if(f&&sScore(k,f)<0)return false;if(pfil==="Takip ettiklerin")return store.fav.indexOf(k)>-1;if(pfil==="Zamlananlar"){var cz=chg(k);return cz!=null&&cz>=20}if(pfil==="Kampanyalı")return !!CAMP[k];return true});
 keys.sort(function(a,b){var fa=store.fav.indexOf(a)>-1,fb=store.fav.indexOf(b)>-1;if(fa!==fb)return fa?-1:1;return a.localeCompare(b,"tr")});
 var el=$("plist");el.innerHTML="";clearTimeout(missT);
 if(!keys.length){el.innerHTML='<div class="empty">'+(pfil==="Takip ettiklerin"?"Henüz takip ettiğin ürün yok. Bir ürünün yanındaki yıldıza dokun.":(Object.keys(I).length?"Bu aramada ürün yok, ekibe bildirildi.":"Fiyat listesi boş."))+'</div>';if(f){var raw=gqv();missT=setTimeout(function(){logMiss(raw,"malzeme")},1500)}return}
