@@ -97,6 +97,45 @@ details summary{cursor:pointer;font-weight:700}
 .wide{width:100%;margin-top:14px;padding:12px!important}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:84px;background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:10px;font-size:14px;z-index:9;max-width:90%;box-shadow:0 4px 14px rgba(0,0,0,.2)}
 button:disabled{opacity:.6;cursor:wait}
+/* ===== Tasarım katmanı: mutfak fişi + fayans duvar ===== */
+:root{--paper:#fffef9;--r:16px;--serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif}
+body::before{content:"";position:absolute;left:0;right:0;top:0;height:260px;z-index:-1;pointer-events:none;
+ background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+ background-size:34px 34px;opacity:.55;-webkit-mask-image:linear-gradient(#000,transparent);mask-image:linear-gradient(#000,transparent)}
+h1{font-family:var(--serif);font-size:32px;font-weight:700;letter-spacing:-.02em;line-height:1.1;margin:10px 0 4px}
+.sub{font-size:15px;margin:0 0 18px}
+h2{font-size:16px;font-weight:800;letter-spacing:-.01em}
+.card{border-radius:var(--r);box-shadow:0 1px 2px rgba(10,30,30,.05)}
+.topbar input{box-shadow:0 1px 2px rgba(10,30,30,.08);border-color:transparent}
+input:focus,select:focus{border-color:var(--acc)}
+.chip{padding:8px 15px;transition:background .15s,color .15s}
+.chip[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--bg)}
+.res{padding:13px 8px;margin:0 -8px;width:calc(100% + 16px);border-radius:10px;transition:background .12s}
+.res:active{background:var(--accbg)}
+.res .price{color:var(--acc);font-size:15px}
+.nm{letter-spacing:-.005em}
+.bnav{border-top:0;box-shadow:0 -8px 24px -14px rgba(10,30,30,.35)}
+.bnav button{border-radius:12px;transition:background .12s,color .12s}
+.bnav button[aria-current="page"]{background:var(--accbg)}
+.banner{border-radius:var(--r)}
+.logo{display:block;border-radius:18px;margin:22px 0 4px;box-shadow:0 6px 16px -8px rgba(14,111,104,.6)}
+/* fiş */
+.ticket{--ink:#1a2b2e;--mut:#5d7176;--line:#d6ddda;--bg:#f0f3f1;--accbg:#d9eeec;--acc:#0e6f68;--ok:#146c43;--warn:#b45309;--warnbg:#fdecd2;
+ position:relative;background:var(--paper);color:var(--ink);border:0;border-radius:8px 8px 0 0;padding:22px 20px 24px;margin-bottom:26px;
+ box-shadow:0 14px 26px -16px rgba(10,30,30,.45)}
+.ticket::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:8px;
+ background:linear-gradient(135deg,var(--paper) 50%,transparent 50%) 0 0/16px 8px repeat-x,linear-gradient(225deg,var(--paper) 50%,transparent 50%) 0 0/16px 8px repeat-x;
+ -webkit-mask:linear-gradient(#000,#000);filter:drop-shadow(0 6px 4px rgba(10,30,30,.12))}
+.ticket>.meta{font-size:14px;font-weight:700;color:var(--mut)}
+.ticket .big{font-size:46px;font-weight:800;letter-spacing:-.035em;margin:2px 0 4px}
+.ticket .line{border-top:1px dashed var(--line);padding:9px 0}
+.ticket .line.hl{border-top:0;background:var(--accbg);margin:10px -10px 4px;padding:12px 10px;border-radius:10px;font-size:18px}
+.ticket .line.hl b{font-size:22px;letter-spacing:-.02em;color:var(--acc)}
+.ticket .two input{background:#fff;border-color:var(--line)}
+.ticket .save{background:var(--accbg)}
+a{color:var(--acc);text-underline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
 .guestnote{display:none}
 .guest .guestnote{display:block}
 .guest .needauth,.guest .star,.guest .bnav button[data-t="lib"]{display:none!important}
@@ -107,6 +146,7 @@ button:disabled{opacity:.6;cursor:wait}
 <body>
 <main>
 <div id="authView" hidden>
+<img class="logo" src="icon-192.png" alt="" width="64" height="64">
 <h1>Mutfak Maliyet</h1>
 <p class="sub">Restoran ve kafeler için anlık reçete maliyeti.</p>
 <section class="card authbox">
@@ -183,7 +223,7 @@ button:disabled{opacity:.6;cursor:wait}
 </div>
 <div style="margin-top:12px">
 <div class="line"><span>Porsiyon maliyeti</span><b id="pc">0,00 ₺</b></div>
-<div class="line"><span>Önerilen satış fiyatı</span><b id="sp">0,00 ₺</b></div>
+<div class="line hl"><span>Önerilen satış fiyatı</span><b id="sp">0,00 ₺</b></div>
 <div class="line"><span id="oldL">Fiyat değişimi</span><b id="old">—</b></div>
 <div class="note" id="drivers"></div>
 </div>
@@ -407,6 +447,7 @@ function cost(n,a,b){return uraw(n)==="adet"?b.p*a:b.p*a/1000}
 function unit(n){var u=uraw(n);return u==="adet"?"adet":u==="lt"?"ml":"g"}
 function sum(list){var t=0,all=0,miss=0;list.forEach(function(it){var b=best(it.n,false),a=best(it.n,true);if(b)t+=cost(it.n,it.a,b);else miss++;if(a)all+=cost(it.n,it.a,a)});return{t:t,all:all,miss:miss}}
 function cp(x){return{n:x.n,a:x.a}}
+function isSample(n,k){return k==="Hâl"?!LIVE[n]:k==="Metro"?!MD[n]:!MS[n]}
 function days(n){var b=PB[n];return b?Math.floor((Date.now()-new Date(b.d).getTime())/864e5):0}
 function pastP(n,b){if(!b||b.own)return null;var k=S.indexOf(b.k),pb=PB[n];if(k<0||!pb||days(n)<MINH)return null;var v=pb.p[k];return v==null||v<=0?null:v}
 function trend(list){var o=0,c=0,n=0,tot=0,d=0;list.forEach(function(it){var b=best(it.n,false);if(!b)return;tot++;var pp=pastP(it.n,b);if(pp==null)return;n++;o+=cost(it.n,it.a,{p:pp});c+=cost(it.n,it.a,b);d=Math.max(d,days(it.n))});var ok=o>0&&n>=Math.ceil(tot*.6);return{ok:ok,pct:ok?(c-o)/o*100:null,d:d}}
@@ -525,6 +566,7 @@ r.innerHTML='<div><div class="nm"></div><div class="meta"></div></div><div class
 r.querySelector(".nm").textContent=it.n;
 var m=r.querySelector(".meta");m.textContent=b?b.s+": "+tl(b.p)+"/"+uraw(it.n):(I[it.n]?"Seçili kaynaklarda yok":"Fiyat listesinde yok");
 if(b&&CAMP[it.n]===b.k)m.insertAdjacentHTML("beforeend",'<span class="tag">kampanya</span>');
+if(b&&!b.own&&isSample(it.n,b.k))m.insertAdjacentHTML("beforeend",'<span class="tag">örnek fiyat</span>');
 var inp=r.querySelector("input");inp.value=it.a;inp.setAttribute("aria-label",it.n+" miktarı");r.querySelector(".qty span").textContent=unit(it.n);
 inp.onchange=function(){it.a=Math.max(0,+inp.value||0);totals()};
 r.querySelector(".rm").onclick=function(){items.splice(i,1);drawRows()};rows.appendChild(r)});
@@ -580,6 +622,7 @@ r.querySelector(".nm").textContent=k;if(CAMP[k])r.querySelector(".nm").insertAdj
 var ms=r.querySelectorAll(".meta");
 ms[0].textContent=d[2]?"Senin girdiğin fiyat":S.map(function(s,j){return lbl(s,k)+" "+(d[1][j]==null?"yok":Math.round(d[1][j]*10)/10)+((j===0&&LIVE[k])||(j===1&&MD[k])?" ✓":"")}).join(" · ");if(LIVE[k]){var ag2=halAge();ms[0].insertAdjacentHTML("afterbegin",ag2>7?'<span style="color:var(--warn);font-weight:700">Hâl ('+ag2+' gün önceki) · </span>':'<span style="color:var(--ok);font-weight:700">Güncel hâl · </span>')}
 r.querySelector(".price").textContent=b?tl(b.p)+"/"+d[0]:"—";
+if(b&&!b.own&&isSample(k,b.k))ms[0].insertAdjacentHTML("beforeend",'<span class="tag">örnek</span>');
 if(d[2])ms[1].textContent="";else{var c=chg(k);if(c==null)ms[1].textContent="";else{ms[1].className=c>=20?"rise":c<0?"down":"meta";ms[1].style.fontSize="13px";ms[1].textContent="son "+days(k)+" günde "+(c>=0?"+":"")+"%"+Math.round(c)}}
 if(ADMIN){var eb=document.createElement("button");eb.className="small";eb.textContent=editK===k?"Kapat":"Fiyat gir";eb.style.fontSize="13px";eb.onclick=function(){editK=editK===k?null:k;drawPrices()};r.children[1].appendChild(eb)}
 el.appendChild(r);if(ADMIN&&editK===k)el.appendChild(priceEditor(k))})}
