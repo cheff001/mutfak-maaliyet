@@ -156,6 +156,9 @@ textarea:focus{border-color:var(--acc)}
 .bsv{flex:0 0 72px;width:72px;height:52px}
 .brow b{display:block}.brow span.d{display:block;color:var(--mut);font-size:14px;margin-top:2px}
 .gnill{width:100%;max-width:340px;height:auto;display:block;margin:0 auto 12px;color:var(--ink)}
+.algbox{border:1.5px solid var(--warn);background:var(--warnbg);border-radius:10px;padding:10px 12px;margin:12px 0;font-size:14px;color:var(--ink)}
+.algbox .ah{font-weight:700;margin:0 0 4px}.algbox div.al{margin-top:3px}.algbox .nt{color:var(--mut);font-size:13px;margin-top:6px}
+.tag.al{background:#fbe3e1;color:#a3201b}
 .gnwrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
 .gnsvg{width:100%;max-width:300px;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
 .gnsvg rect.cell{fill:var(--acc);fill-opacity:.18;stroke:var(--acc);stroke-width:2}
@@ -217,6 +220,7 @@ textarea:focus{border-color:var(--acc)}
 <input id="rtitle" class="title" aria-label="Yemek adı">
 <p class="note" id="calcInfo" style="margin:0 0 6px"></p>
 <div id="rows"></div>
+<div class="algbox" id="calcAlg" hidden></div>
 <div class="addbox">
 <input id="iq" type="search" placeholder="Malzeme ara ve ekle: kaşar, mantar…" aria-label="Malzeme ara" autocomplete="off">
 <div id="isug"></div>
@@ -306,7 +310,7 @@ textarea:focus{border-color:var(--acc)}
 <p class="note" style="margin:0 0 6px">Çapraz bulaşmayı önlemek için her gıda grubuna ayrı renk kullanılır. Bu, HACCP uygulamalarında en yaygın düzen. Üreticiye ve ülkeye göre küçük farklar olabilir, işletmende hangisi geçerliyse onu uygula.</p>
 <div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#d0312d" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="rgba(0,0,0,.25)" stroke-width="1"/><path d="M14 29c0-9 9-13 18-11 8 2 11 9 6 15-4 6-15 6-21 2-2-2-3-4-3-6z" fill="#fff" fill-opacity=".9"/><circle cx="29" cy="27" r="4.2" fill="#d0312d"/></svg><div><b>Kırmızı: çiğ kırmızı et</b><span class="d">Dana, kuzu, kıyma. Çiğ et başka hiçbir gıdayla aynı tahtaya gelmez.</span></div></div>
 <div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#2b6cc4" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="rgba(0,0,0,.25)" stroke-width="1"/><ellipse cx="29" cy="26" rx="14" ry="7.5" fill="#fff" fill-opacity=".92"/><path d="M42 26l11-8.5v17z" fill="#fff" fill-opacity=".92"/><circle cx="21" cy="24" r="1.7" fill="#2b6cc4"/></svg><div><b>Mavi: çiğ balık ve deniz ürünleri</b><span class="d">Balık, karides, midye. Alerjen riski yüksek olduğu için ayrı tutulur.</span></div></div>
-<div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#f2c230" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="rgba(0,0,0,.25)" stroke-width="1"/><circle cx="26" cy="22" r="10" fill="#fff" fill-opacity=".92"/><path d="M33 29l11 10" stroke="#fff" stroke-opacity=".92" stroke-width="5" stroke-linecap="round"/><circle cx="46" cy="41" r="3.2" fill="#fff" fill-opacity=".92"/></svg><div><b>Sarı: çiğ tavuk ve hindi</b><span class="d">Kümes hayvanlarında salmonella riski yüksek. İngiltere'de sarı genelde pişmiş et için kullanılır, o yüzden tahtanın üzerindeki etikete bak.</span></div></div>
+<div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#f2c230" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="rgba(0,0,0,.25)" stroke-width="1"/><ellipse cx="25" cy="23" rx="13" ry="10" transform="rotate(-35 25 23)" fill="#fff" fill-opacity=".92"/><path d="M33 31l11 9" stroke="#fff" stroke-opacity=".92" stroke-width="4" stroke-linecap="round"/><circle cx="46" cy="43" r="3.2" fill="#fff" fill-opacity=".92"/><circle cx="51" cy="39" r="3.2" fill="#fff" fill-opacity=".92"/><path d="M17 20a8 8 0 0 1 7-5" stroke="#f2c230" stroke-width="2" fill="none" stroke-linecap="round" opacity=".9"/></svg><div><b>Sarı: çiğ tavuk ve hindi</b><span class="d">Kümes hayvanlarında salmonella riski yüksek. İngiltere'de sarı genelde pişmiş et için kullanılır, o yüzden tahtanın üzerindeki etikete bak.</span></div></div>
 <div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#3a9d4a" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="rgba(0,0,0,.25)" stroke-width="1"/><path d="M14 36C14 19 27 12 46 14 46 29 37 40 14 36z" fill="#fff" fill-opacity=".92"/><path d="M16 35L38 20" stroke="#3a9d4a" stroke-width="2" stroke-linecap="round"/></svg><div><b>Yeşil: sebze, meyve, salata</b><span class="d">Yıkanıp çiğ yenecek her şey. Salata ve garnitür burada hazırlanır.</span></div></div>
 <div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#8a5a35" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="rgba(0,0,0,.25)" stroke-width="1"/><path d="M13 21l36 7-36 8z" fill="#fff" fill-opacity=".92"/><path d="M49 28l7-5M49 28l8 1" stroke="#fff" stroke-opacity=".92" stroke-width="3" stroke-linecap="round"/></svg><div><b>Kahverengi: kök sebzeler</b><span class="d">Toprağı yeni alınmış patates, havuç, soğan. Bazı mutfaklarda pişmiş et için ayrılır.</span></div></div>
 <div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#f4f4f0" stroke="#b9b9b2" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="#b9b9b2" stroke-width="1"/><path d="M12 37h38V23z" fill="#f2c230"/><circle cx="36" cy="33" r="2.2" fill="#fff"/><circle cx="27" cy="35" r="1.6" fill="#fff"/></svg><div><b>Beyaz: süt ürünleri ve fırın</b><span class="d">Peynir, tereyağı, hamur işi, poğaça, börek, pasta hazırlığı. Un ve süt ürünleri çiğ et tahtasına değmemeli.</span></div></div>
@@ -713,6 +717,7 @@ var ALGL=[["gl","Gluten","Buğday, çavdar, arpa, yulaf","Un, makarna, bulgur, e
 ["sl","Kükürt dioksit ve sülfitler","Kuru meyve, şarap, sirke, bazı konserveler","Kuru kayısı, üzüm, şarap sirkesi, hazır konserve ve turşular. 10 mg/kg üzerinde bildirilir."],
 ["ac","Acı bakla (lüpen)","Lüpen ve unu","Bazı ekmek, makarna ve glütensiz ürünler."],
 ["ym","Yumuşakçalar","Midye, kalamar, ahtapot, istiridye, salyangoz","Deniz ürünleri tabakları, meze ve çorbalar."]];
+var ALS={gl:"gluten",kb:"kabuklu",yu:"yumurta",ba:"balık",yf:"fıstık",so:"soya",su:"süt",sk:"yemiş",ke:"kereviz",ha:"hardal",se:"susam",sl:"sülfit",ac:"lüpen",ym:"yumuşakça"};
 var ALG={"Un":"gl","Makarna":"gl","Bulgur":"gl","İnce bulgur":"gl","İrmik":"gl","Yufka":"gl","Lavaş":"gl","Tortilla":"gl","Baget ekmek":"gl","Hamburger ekmeği":"gl","Tost ekmeği dilimi":"gl","Tel şehriye":"gl","Lazanya yaprağı":"gl","Milföy hamuru":"gl","Kadayıf":"gl","Kedi dili bisküvi":"gl,yu","Petibör bisküvi":"gl","Tarhana":"gl,su","Yumurtalı noodle":"gl,yu","Soya sosu":"so,gl","Teriyaki sos":"so,gl","Yumurta":"yu","Mayonez":"yu","Karides":"kb","Somon":"ba","Yer fıstığı":"yf","Ceviz":"sk","Fındık":"sk","Antep fıstığı":"sk","Süt":"su","Yoğurt":"su","Süzme yoğurt":"su","Tereyağı":"su","Krema":"su","Beyaz peynir":"su","Kaşar":"su","Mozzarella":"su","Parmesan":"su","Cheddar":"su","Gravyer":"su","Mascarpone":"su","Krem peynir":"su","Künefelik peynir":"su","Tahin":"se","Susam":"se","Susam yağı":"se"};
 function algOf(items){var o={};items.forEach(function(it){(ALG[it.n]||"").split(",").forEach(function(k){if(k)o[k]=1})});return ALGL.filter(function(a){return o[a[0]]}).map(function(a){return a[1]})}
 var algSel="gl";
@@ -766,10 +771,16 @@ r.querySelector(".nm").textContent=it.n;
 var m=r.querySelector(".meta");m.textContent=b?b.s+": "+tl(b.p)+"/"+uraw(it.n):(I[it.n]?"Seçili kaynaklarda yok":"Fiyat listesinde yok");
 if(b&&CAMP[it.n]===b.k)m.insertAdjacentHTML("beforeend",'<span class="tag">kampanya</span>');
 if(b&&!b.own&&isSample(it.n,b.k))m.insertAdjacentHTML("beforeend",'<span class="tag">örnek fiyat</span>');
+(ALG[it.n]||"").split(",").forEach(function(k){if(!k)return;var sp=document.createElement("span");sp.className="tag al";sp.textContent=ALS[k];m.appendChild(sp)});
 var inp=r.querySelector("input");inp.value=it.a;inp.setAttribute("aria-label",it.n+" miktarı");r.querySelector(".qty span").textContent=unit(it.n);
 inp.onchange=function(){it.a=Math.max(0,+inp.value||0);totals()};
 r.querySelector(".rm").onclick=function(){items.splice(i,1);drawRows()};rows.appendChild(r)});
-totals()}
+drawCalcAlg();totals()}
+function drawCalcAlg(){var box=$("calcAlg"),by={};items.forEach(function(it){(ALG[it.n]||"").split(",").forEach(function(k){if(k){(by[k]=by[k]||[]).push(it.n)}})});
+var ks=ALGL.filter(function(a){return by[a[0]]}),own=items.some(function(it){return I[it.n]&&I[it.n][2]});
+if(!ks.length){box.hidden=true;return}box.hidden=false;box.innerHTML='<p class="ah"></p><div class="lst"></div><p class="nt"></p>';box.querySelector(".ah").textContent="Alerjenler: "+ks.map(function(a){return a[1]}).join(", ");
+var l=box.querySelector(".lst");ks.forEach(function(a){var d=document.createElement("div");d.className="al";var b=document.createElement("b");b.textContent=a[1]+": ";d.appendChild(b);d.appendChild(document.createTextNode(by[a[0]].join(", ")));l.appendChild(d)});
+box.querySelector(".nt").textContent="Sade ürünlere göre. Hazır ürünlerde (bulyon, sos, çikolata, bisküvi) etiketi kontrol et."+(own?" Kendi eklediğin malzemeler kontrol edilmedi.":"")}
 function totals(){var s=sum(items),mar=marg(),p=Math.max(1,+$("por").value||1);
 $("total").textContent=tl(s.t);$("pc").textContent=tl(s.t/p);$("sp").textContent=tl((s.t/p)/(1-mar/100));
 var d=s.t-s.all;$("save").hidden=!(d>0.5);if(d>0.5)$("save").textContent="Tüm kaynaklardan en ucuzunu seçersen "+tl(d)+" daha az öder, maliyet "+tl(s.all)+" olur.";
