@@ -153,8 +153,9 @@ textarea:focus{border-color:var(--acc)}
 .gtabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
 .brow{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
 .brow:first-of-type{border-top:0}
-.sw{flex:0 0 46px;height:34px;border-radius:8px;border:1px solid rgba(0,0,0,.18);margin-top:2px}
+.bsv{flex:0 0 72px;width:72px;height:52px}
 .brow b{display:block}.brow span.d{display:block;color:var(--mut);font-size:14px;margin-top:2px}
+.gnill{width:100%;max-width:340px;height:auto;display:block;margin:0 auto 12px;color:var(--ink)}
 .gnwrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
 .gnsvg{width:100%;max-width:300px;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
 .gnsvg rect.cell{fill:var(--acc);fill-opacity:.18;stroke:var(--acc);stroke-width:2}
@@ -303,21 +304,45 @@ textarea:focus{border-color:var(--acc)}
 <section class="card" id="gBoards" hidden>
 <h2>Kesme tahtası renkleri</h2>
 <p class="note" style="margin:0 0 6px">Çapraz bulaşmayı önlemek için her gıda grubuna ayrı renk kullanılır. Bu, HACCP uygulamalarında en yaygın düzen. Üreticiye ve ülkeye göre küçük farklar olabilir, işletmende hangisi geçerliyse onu uygula.</p>
-<div class="brow"><div class="sw" style="background:#d0312d"></div><div><b>Kırmızı: çiğ kırmızı et</b><span class="d">Dana, kuzu, kıyma. Çiğ et başka hiçbir gıdayla aynı tahtaya gelmez.</span></div></div>
-<div class="brow"><div class="sw" style="background:#2b6cc4"></div><div><b>Mavi: çiğ balık ve deniz ürünleri</b><span class="d">Balık, karides, midye. Alerjen riski yüksek olduğu için ayrı tutulur.</span></div></div>
-<div class="brow"><div class="sw" style="background:#f2c230"></div><div><b>Sarı: çiğ tavuk ve hindi</b><span class="d">Kümes hayvanlarında salmonella riski yüksek. İngiltere'de sarı genelde pişmiş et için kullanılır, o yüzden tahtanın üzerindeki etikete bak.</span></div></div>
-<div class="brow"><div class="sw" style="background:#3a9d4a"></div><div><b>Yeşil: sebze, meyve, salata</b><span class="d">Yıkanıp çiğ yenecek her şey. Salata ve garnitür burada hazırlanır.</span></div></div>
-<div class="brow"><div class="sw" style="background:#8a5a35"></div><div><b>Kahverengi: kök sebzeler</b><span class="d">Toprağı yeni alınmış patates, havuç, soğan. Bazı mutfaklarda pişmiş et için ayrılır.</span></div></div>
-<div class="brow"><div class="sw" style="background:#f4f4f0"></div><div><b>Beyaz: süt ürünleri ve fırın</b><span class="d">Peynir, tereyağı, hamur işi, poğaça, börek, pasta hazırlığı. Un ve süt ürünleri çiğ et tahtasına değmemeli.</span></div></div>
+<div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#d0312d" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="rgba(0,0,0,.25)" stroke-width="1"/><path d="M14 29c0-9 9-13 18-11 8 2 11 9 6 15-4 6-15 6-21 2-2-2-3-4-3-6z" fill="#fff" fill-opacity=".9"/><circle cx="29" cy="27" r="4.2" fill="#d0312d"/></svg><div><b>Kırmızı: çiğ kırmızı et</b><span class="d">Dana, kuzu, kıyma. Çiğ et başka hiçbir gıdayla aynı tahtaya gelmez.</span></div></div>
+<div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#2b6cc4" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="rgba(0,0,0,.25)" stroke-width="1"/><ellipse cx="29" cy="26" rx="14" ry="7.5" fill="#fff" fill-opacity=".92"/><path d="M42 26l11-8.5v17z" fill="#fff" fill-opacity=".92"/><circle cx="21" cy="24" r="1.7" fill="#2b6cc4"/></svg><div><b>Mavi: çiğ balık ve deniz ürünleri</b><span class="d">Balık, karides, midye. Alerjen riski yüksek olduğu için ayrı tutulur.</span></div></div>
+<div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#f2c230" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="rgba(0,0,0,.25)" stroke-width="1"/><circle cx="26" cy="22" r="10" fill="#fff" fill-opacity=".92"/><path d="M33 29l11 10" stroke="#fff" stroke-opacity=".92" stroke-width="5" stroke-linecap="round"/><circle cx="46" cy="41" r="3.2" fill="#fff" fill-opacity=".92"/></svg><div><b>Sarı: çiğ tavuk ve hindi</b><span class="d">Kümes hayvanlarında salmonella riski yüksek. İngiltere'de sarı genelde pişmiş et için kullanılır, o yüzden tahtanın üzerindeki etikete bak.</span></div></div>
+<div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#3a9d4a" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="rgba(0,0,0,.25)" stroke-width="1"/><path d="M14 36C14 19 27 12 46 14 46 29 37 40 14 36z" fill="#fff" fill-opacity=".92"/><path d="M16 35L38 20" stroke="#3a9d4a" stroke-width="2" stroke-linecap="round"/></svg><div><b>Yeşil: sebze, meyve, salata</b><span class="d">Yıkanıp çiğ yenecek her şey. Salata ve garnitür burada hazırlanır.</span></div></div>
+<div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#8a5a35" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="rgba(0,0,0,.25)" stroke-width="1"/><path d="M13 21l36 7-36 8z" fill="#fff" fill-opacity=".92"/><path d="M49 28l7-5M49 28l8 1" stroke="#fff" stroke-opacity=".92" stroke-width="3" stroke-linecap="round"/></svg><div><b>Kahverengi: kök sebzeler</b><span class="d">Toprağı yeni alınmış patates, havuç, soğan. Bazı mutfaklarda pişmiş et için ayrılır.</span></div></div>
+<div class="brow"><svg class="bsv" viewBox="0 0 72 52" aria-hidden="true"><rect x="1.5" y="1.5" width="69" height="49" rx="11" fill="#f4f4f0" stroke="#b9b9b2" stroke-width="1.5"/><circle cx="61" cy="26" r="4.2" fill="#fff" fill-opacity=".75" stroke="#b9b9b2" stroke-width="1"/><path d="M12 37h38V23z" fill="#f2c230"/><circle cx="36" cy="33" r="2.2" fill="#fff"/><circle cx="27" cy="35" r="1.6" fill="#fff"/></svg><div><b>Beyaz: süt ürünleri ve fırın</b><span class="d">Peynir, tereyağı, hamur işi, poğaça, börek, pasta hazırlığı. Un ve süt ürünleri çiğ et tahtasına değmemeli.</span></div></div>
 <p class="note" style="margin:10px 0 0">Kural: aynı bıçak ve tahtayla önce çiğ et, sonra salata kesilmez. Tahtayı kullanım arasında sıcak suyla ve deterjanla yıka.</p>
 </section>
 <section class="card" id="gGn" hidden>
 <h2>Gastronom (GN) küvet boyutları</h2>
 <p class="note" style="margin:0 0 8px">Standart GN küvetler (EN 631) 1/1 boyutunun bölümleridir. Boyut seç, ana küvetin içinde nasıl yer aldığını gör.</p>
+<svg class="gnill" viewBox="0 0 340 448" role="img" aria-label="GN küvetin üstten ve yandan görünümü, derinlik seçenekleri">
+<g font-family="inherit" font-size="11" fill="currentColor">
+<text x="8" y="14" font-weight="700">Üstten</text>
+<rect x="8" y="22" width="212" height="130" rx="9" fill="#d8dedf" stroke="#8b9a9d" stroke-width="2"/>
+<rect x="17" y="31" width="194" height="112" rx="6" fill="#f4f7f7" stroke="#8b9a9d" stroke-width="1.5"/>
+<text x="114" y="91" text-anchor="middle" fill="#5d7176">iç yüzey</text>
+<path d="M8 164h212M8 160v8M220 160v8" stroke="#5d7176" stroke-width="1.2" fill="none"/><text x="114" y="180" text-anchor="middle" fill="#5d7176">530 mm</text>
+<path d="M232 22v130M228 22h8M228 152h8" stroke="#5d7176" stroke-width="1.2" fill="none"/><text x="262" y="91" fill="#5d7176">325 mm</text>
+<text x="238" y="40" fill="#5d7176" font-size="10">dış kenar (flanş):</text><text x="238" y="53" fill="#5d7176" font-size="10">dolap rayına oturur</text>
+<text x="8" y="206" font-weight="700">Yandan</text>
+<path d="M8 214h212v7H8z" fill="#d8dedf" stroke="#8b9a9d" stroke-width="1.5"/>
+<path d="M18 221h192l-10 56H28z" fill="#e8eded" stroke="#8b9a9d" stroke-width="1.5"/>
+<path d="M232 221v56M228 221h8M228 277h8" stroke="#5d7176" stroke-width="1.2" fill="none"/><text x="240" y="253" fill="#5d7176">derinlik</text>
+<text x="8" y="304" font-weight="700">Derinlikler (mm)</text>
+</g>
+<g id="gnDepths"></g>
+</svg>
 <div class="chips" id="gnSizes" style="margin:0 0 10px"></div>
 <div class="gnwrap"><svg class="gnsvg" id="gnSvg" viewBox="-6 -6 542 337" role="img" aria-label="1/1 küvet içinde seçilen boyutun yerleşimi"></svg><p class="note" id="gnInfo" style="flex:1;min-width:150px;margin:0"></p></div>
 <table class="gntbl" id="gnTbl"></table>
 <p class="note" style="margin:10px 0 0">Derinlik seçenekleri: 20, 40, 65, 100, 150 ve 200 mm. Yaklaşık hacim, 1/1 küvet için: 20 mm ≈ 2,5 lt, 40 mm ≈ 5 lt, 65 mm ≈ 9 lt, 100 mm ≈ 14 lt, 150 mm ≈ 20 lt, 200 mm ≈ 28 lt. Diğer boyutlarda alanla orantılı hesapla. Değerler üreticiye göre biraz değişir.</p>
+</section>
+<section class="card" id="gAlg" hidden>
+<h2>Alerjenler</h2>
+<p class="note" style="margin:0 0 8px">Gıda mevzuatında bildirilmesi zorunlu 14 ana alerjen. Birine dokun, mutfakta nerelerde çıktığını ve listedeki hangi malzemelerin içerdiğini gör.</p>
+<div class="chips" id="algChips" style="margin:0 0 10px"></div>
+<div id="algInfo"></div>
+<p class="note" style="margin:10px 0 0">Malzeme eşleşmesi sade ürünlere göre yapıldı. Bulyon, hazır sos, salça, çikolata, margarin ve bisküvi gibi hazır ürünlerde içerik markaya göre değişir, her zaman ambalaj etiketini kontrol et. Çapraz bulaşma (aynı tahta, bıçak, yağ) etikette görünmez.</p>
 </section>
 <section class="card" id="gTemp" hidden>
 <h2>Güvenli sıcaklıklar</h2>
@@ -641,7 +666,7 @@ catch(e){console.warn(e);guest=false;document.body.classList.remove("guest");sho
 var tab="calc",calc=null,items=[],por=4,pick=null,armed=null,curShop=null,pendingShop=null,openIdx=-1,cat="Tümü",pfil="Tümü",missT=null;
 var PH={calc:"Hesaplanacak yemeği ara",price:"Ürün ara: domates, tereyağı…",rec:"Tarif ara: pizza, taco, köri…",lib:"İşletme ya da yemek ara",guide:"",profile:""};
 function gqv(){return $("gq").value}
-var TITLES={profile:["Profil","Hesabın ve özetin."],calc:["Maliyet hesapla","Bir yemek seç ya da boş hesap başlat, maliyeti anında gör."],price:["Ürün fiyatları","Hâl, Metro ve market fiyatlarını takip et."],rec:["Tarifler","Klasik tariflere göz at, menüne ilham al."],guide:["Mutfak rehberi","Tahta renkleri, GN küvetler, güvenli sıcaklıklar."],lib:["Kütüphane","İşletmelerin ve her birinde yapılan yemeklerin maliyetleri."]};
+var TITLES={profile:["Profil","Hesabın ve özetin."],calc:["Maliyet hesapla","Bir yemek seç ya da boş hesap başlat, maliyeti anında gör."],price:["Ürün fiyatları","Hâl, Metro ve market fiyatlarını takip et."],rec:["Tarifler","Klasik tariflere göz at, menüne ilham al."],guide:["Mutfak rehberi","Tahta renkleri, GN küvetler, alerjenler, sıcaklıklar."],lib:["Kütüphane","İşletmelerin ve her birinde yapılan yemeklerin maliyetleri."]};
 function go(t){if(t!==tab){$("gq").value="";openIdx=-1}tab=t;var v={calc:"calcView",price:"priceView",rec:"recView",guide:"guideView",lib:curShop?"shopView":"libView",profile:"profileView"}[t];
 ["calcView","priceView","recView","guideView","libView","shopView","profileView"].forEach(function(id){$(id).hidden=id!==v});
 $("gq").placeholder=PH[t];$("gq").hidden=t==="profile"||t==="guide";
@@ -651,9 +676,9 @@ $("ttl").textContent=TITLES[t][0];$("tsub").textContent=TITLES[t][1];draw()}
 /* ---------- REHBER ---------- */
 var gTab="Tahta renkleri",gnSel="1/1";
 var GN=[["1/1","530 × 325","1","Ana yemek, pilav, fırın tepsisi"],["2/3","354 × 325","1,5","Orta porsiyon garnitür"],["1/2","325 × 265","2","Garnitür, sebze, tatlı"],["1/3","325 × 176","3","Sos, sıcak garnitür, soğuk meze"],["1/4","265 × 162","4","Doğranmış sebze, peynir"],["1/6","176 × 162","6","Soğan, mantar, zeytin, kaşar"],["1/9","176 × 108","9","Baharat, sos, süsleme"]];
-function drawGuide(){var tabs=["Tahta renkleri","GN küvetler","Sıcaklıklar"],el=$("gTabs");el.innerHTML="";
+function drawGuide(){var tabs=["Tahta renkleri","GN küvetler","Alerjenler","Sıcaklıklar"],el=$("gTabs");el.innerHTML="";
 tabs.forEach(function(t){var b=document.createElement("button");b.className="chip";b.textContent=t;b.setAttribute("aria-pressed",t===gTab);b.onclick=function(){gTab=t;drawGuide()};el.appendChild(b)});
-$("gBoards").hidden=gTab!=="Tahta renkleri";$("gGn").hidden=gTab!=="GN küvetler";$("gTemp").hidden=gTab!=="Sıcaklıklar";if(gTab==="GN küvetler")drawGn()}
+$("gBoards").hidden=gTab!=="Tahta renkleri";$("gGn").hidden=gTab!=="GN küvetler";$("gTemp").hidden=gTab!=="Sıcaklıklar";$("gAlg").hidden=gTab!=="Alerjenler";if(gTab==="Alerjenler")drawAlg();if(gTab==="GN küvetler")drawGn()}
 function gnCells(z){var W=530,H=325,c=[],i,j;
 if(z==="1/1")c=[[0,0,W,H]];
 else if(z==="2/3")c=[[0,0,W*2/3,H]];
@@ -663,7 +688,8 @@ else if(z==="1/4"){for(i=0;i<2;i++)for(j=0;j<2;j++)c.push([i*W/2,j*H/2,W/2,H/2])
 else if(z==="1/6"){for(i=0;i<3;i++)for(j=0;j<2;j++)c.push([i*W/3,j*H/2,W/3,H/2])}
 else if(z==="1/9"){for(i=0;i<3;i++)for(j=0;j<3;j++)c.push([i*W/3,j*H/3,W/3,H/3])}
 return c}
-function drawGn(){var el=$("gnSizes");el.innerHTML="";GN.forEach(function(g){var b=document.createElement("button");b.className="chip";b.textContent=g[0];b.setAttribute("aria-pressed",g[0]===gnSel);b.onclick=function(){gnSel=g[0];drawGn()};el.appendChild(b)});
+function drawDepths(){var h="",x=8;[20,40,65,100,150,200].forEach(function(d){var ht=d*0.45,y=426-ht;h+='<path d="M'+x+' '+y+'h40l-4 '+ht+'h-32z" fill="#e8eded" stroke="#8b9a9d" stroke-width="1.2"/><text x="'+(x+20)+'" y="440" font-size="10" text-anchor="middle" fill="currentColor">'+d+'</text>';x+=54});$("gnDepths").innerHTML=h}
+function drawGn(){drawDepths();var el=$("gnSizes");el.innerHTML="";GN.forEach(function(g){var b=document.createElement("button");b.className="chip";b.textContent=g[0];b.setAttribute("aria-pressed",g[0]===gnSel);b.onclick=function(){gnSel=g[0];drawGn()};el.appendChild(b)});
 var cs=gnCells(gnSel),h='<rect class="rest" x="0" y="0" width="530" height="325" rx="6"/>';
 cs.forEach(function(c,i){h+='<rect class="cell" x="'+(c[0]+3)+'" y="'+(c[1]+3)+'" width="'+(c[2]-6)+'" height="'+(c[3]-6)+'" rx="5"'+(i>0?' style="fill-opacity:.07"':'')+'/>'});
 if(gnSel==="2/3")h+='<rect class="rest" x="'+(530*2/3+3)+'" y="3" width="'+(530/3-6)+'" height="319" rx="5"/>';
@@ -671,6 +697,32 @@ $("gnSvg").innerHTML=h;var g=GN.filter(function(x){return x[0]===gnSel})[0];
 $("gnInfo").innerHTML="<b>GN "+g[0]+"</b><br>Boyut: "+g[1]+" mm<br>"+(gnSel==="1/1"?"Ana boyut.":gnSel==="2/3"?"1/1 içine 1 adet 2/3 ve yanına 1 adet 1/3 sığar.":"1/1 içine "+g[2]+" adet sığar.")+"<br>Tipik kullanım: "+g[3];
 var t='<tr><th>Boyut</th><th>mm</th><th>1/1 içinde</th></tr>';GN.forEach(function(x){t+='<tr'+(x[0]===gnSel?' class="on"':'')+'><td><b>'+x[0]+'</b></td><td>'+x[1]+'</td><td>'+(x[0]==="1/1"?"ana boyut":x[0]==="2/3"?"1 adet + 1/3":x[2]+" adet")+'</td></tr>'});
 $("gnTbl").innerHTML=t}
+
+/* ---------- ALERJENLER ---------- */
+var ALGL=[["gl","Gluten","Buğday, çavdar, arpa, yulaf","Un, makarna, bulgur, ekmek, yufka, irmik, bisküvi, bazı soslar ve bulyonlar."],
+["kb","Kabuklu deniz ürünleri","Karides, yengeç, ıstakoz, kerevit","Deniz ürünleri yemekleri, bazı soslar ve çorbalar."],
+["yu","Yumurta","Yumurta ve yumurtalı ürünler","Mayonez, hamur işleri, pasta ve krema, bazı makarnalar ve soslar."],
+["ba","Balık","Her türlü balık","Balık yemekleri, bazı soslar (Worcestershire gibi), balık suyu."],
+["yf","Yer fıstığı","Yer fıstığı ve ezmesi","Tatlılar, bazı soslar, Uzak Doğu yemekleri. Çok küçük miktar bile ağır tepki verebilir."],
+["so","Soya","Soya fasulyesi ve ürünleri","Soya sosu, teriyaki, tofu, bazı ekmek ve hazır ürünler."],
+["su","Süt (laktoz dahil)","Süt ve süt ürünleri","Peynir, tereyağı, krema, yoğurt, muhallebi, sütlü tatlılar, bazı hamur işleri."],
+["sk","Sert kabuklu yemişler","Fındık, ceviz, badem, antep fıstığı, kaju, pekan, makadamya","Baklava, kurabiye, pasta, kek, salata ve sos süslemeleri."],
+["ke","Kereviz","Kök, yaprak ve tohumu","Bulyon, çorbalar, salata, hazır baharat karışımları."],
+["ha","Hardal","Hardal ve tohumu","Salata sosları, mayonez çeşitleri, turşular, bazı et marinasyonları."],
+["se","Susam","Susam ve ürünleri","Tahin, simit, poğaça üstü, susam yağı, Uzak Doğu yemekleri."],
+["sl","Kükürt dioksit ve sülfitler","Kuru meyve, şarap, sirke, bazı konserveler","Kuru kayısı, üzüm, şarap sirkesi, hazır konserve ve turşular. 10 mg/kg üzerinde bildirilir."],
+["ac","Acı bakla (lüpen)","Lüpen ve unu","Bazı ekmek, makarna ve glütensiz ürünler."],
+["ym","Yumuşakçalar","Midye, kalamar, ahtapot, istiridye, salyangoz","Deniz ürünleri tabakları, meze ve çorbalar."]];
+var ALG={"Un":"gl","Makarna":"gl","Bulgur":"gl","İnce bulgur":"gl","İrmik":"gl","Yufka":"gl","Lavaş":"gl","Tortilla":"gl","Baget ekmek":"gl","Hamburger ekmeği":"gl","Tost ekmeği dilimi":"gl","Tel şehriye":"gl","Lazanya yaprağı":"gl","Milföy hamuru":"gl","Kadayıf":"gl","Kedi dili bisküvi":"gl,yu","Petibör bisküvi":"gl","Tarhana":"gl,su","Yumurtalı noodle":"gl,yu","Soya sosu":"so,gl","Teriyaki sos":"so,gl","Yumurta":"yu","Mayonez":"yu","Karides":"kb","Somon":"ba","Yer fıstığı":"yf","Ceviz":"sk","Fındık":"sk","Antep fıstığı":"sk","Süt":"su","Yoğurt":"su","Süzme yoğurt":"su","Tereyağı":"su","Krema":"su","Beyaz peynir":"su","Kaşar":"su","Mozzarella":"su","Parmesan":"su","Cheddar":"su","Gravyer":"su","Mascarpone":"su","Krem peynir":"su","Künefelik peynir":"su","Tahin":"se","Susam":"se","Susam yağı":"se"};
+function algOf(items){var o={};items.forEach(function(it){(ALG[it.n]||"").split(",").forEach(function(k){if(k)o[k]=1})});return ALGL.filter(function(a){return o[a[0]]}).map(function(a){return a[1]})}
+var algSel="gl";
+function drawAlg(){var el=$("algChips");el.innerHTML="";ALGL.forEach(function(a){var b=document.createElement("button");b.className="chip";b.textContent=a[1];b.setAttribute("aria-pressed",a[0]===algSel);b.onclick=function(){algSel=a[0];drawAlg()};el.appendChild(b)});
+var a=ALGL.filter(function(x){return x[0]===algSel})[0],ings=Object.keys(ALG).filter(function(k){return I[k]&&ALG[k].split(",").indexOf(algSel)>-1}).sort(function(x,y){return x.localeCompare(y,"tr")});
+var inR=R.filter(function(r){return !r.own&&r.it.some(function(it){return(ALG[it.n]||"").split(",").indexOf(algSel)>-1})}).length,tot=R.filter(function(r){return !r.own}).length;
+var h='<p style="margin:0 0 6px"><b></b></p><p class="note" style="margin:0 0 6px"></p><p class="note" style="margin:0 0 6px"></p><p class="note" style="margin:0 0 6px"></p><p class="note" style="margin:0"></p>';
+var d=$("algInfo");d.innerHTML=h;var ps=d.querySelectorAll("p");ps[0].firstChild.textContent=a[1];ps[1].textContent="Kaynak: "+a[2]+".";ps[2].textContent="Mutfakta: "+a[3];
+ps[3].textContent=ings.length?"Listedeki malzemelerden içerenler: "+ings.join(", ")+".":"Listedeki malzemelerde bilinen bir kaynağı yok.";
+ps[4].textContent=inR+" / "+tot+" klasik tarifte bu alerjen var."}
 function draw(){drawSources();if(tab==="profile")drawProfile();else if(tab==="calc")drawCalc();else if(tab==="price")drawPrices();else if(tab==="rec")drawRecs();else if(tab==="guide")drawGuide();else if(curShop)drawShop();else drawLib()}
 function halAge(){return HALD?Math.max(0,Math.floor((Date.now()-new Date(HALD).getTime())/864e5)):0}
 function drawSources(){var hw=$("halWarn");if(hw){var ag=halAge();hw.hidden=!(sel["Hâl"]&&HALD&&ag>7);hw.textContent="Dikkat: hâl fiyatları "+ag+" gün önceki veri. Bursa Belediyesi hâl verisini güncellemedi, maliyet eski fiyatla hesaplanıyor."}["srcCalc","srcPrice"].forEach(function(id){var el=$(id);el.innerHTML="";S.forEach(function(s){var b=document.createElement("button");b.className="chip";b.textContent=s;b.setAttribute("aria-pressed",!!sel[s]);b.onclick=function(){sel[s]=!sel[s];savePrefs();draw()};el.appendChild(b)})})}
@@ -837,6 +889,7 @@ list.forEach(function(i){var w=document.createElement("div");w.appendChild(recRo
 if(openIdx===i){var r=R[i],p=document.createElement("div");p.className="panel";
 p.innerHTML='<p class="meta"></p><button class="go">Maliyetini hesapla</button>';
 p.querySelector("p").textContent=r.it.length?r.it.map(function(x){return x.n+" "+x.a+" "+unit(x.n)}).join(", "):"Henüz malzeme yok.";
+var al=algOf(r.it),ap=document.createElement("p");ap.className="note";ap.style.margin="8px 0 0";ap.textContent=al.length?"Alerjenler: "+al.join(", ")+". Hazır ürünlerde etiketi kontrol et.":"Bilinen alerjen kaynağı yok. Hazır ürünlerde etiketi kontrol et.";p.insertBefore(ap,p.querySelector("button"));
 p.querySelector("button").onclick=function(){openRecipe(i)};w.appendChild(p)}
 el.appendChild(w)})}
 function drawBanner(){var el=$("banner");
