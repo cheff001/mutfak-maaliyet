@@ -21,7 +21,7 @@
 .avatar{flex:none;width:42px;height:42px;border-radius:50%;border:0;background:var(--acc);color:var(--bg);font:inherit;font-weight:800;font-size:17px;cursor:pointer}
 .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 .stat div{background:var(--bg);border-radius:10px;padding:10px;text-align:center}
-.stat b{display:block;font-size:22px}
+.astat b{display:block;font-size:22px}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Trebuchet MS","Segoe UI",system-ui,sans-serif}
 main{max-width:640px;margin:0 auto;padding:18px 14px 110px}
 h1{font-size:26px;margin:4px 0 2px;letter-spacing:-.4px}
@@ -159,6 +159,10 @@ textarea:focus{border-color:var(--acc)}
 .algbox{border:1.5px solid var(--warn);background:var(--warnbg);border-radius:10px;padding:10px 12px;margin:12px 0;font-size:14px;color:var(--ink)}
 .algbox .ah{font-weight:700;margin:0 0 4px}.algbox div.al{margin-top:3px}.algbox .nt{color:var(--mut);font-size:13px;margin-top:6px}
 .tag.al{background:#fbe3e1;color:#a3201b}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.astat{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.astat b{display:block;font-size:26px;font-family:var(--serif,inherit);line-height:1.1}
+.astat span{display:block;color:var(--mut);font-size:13px}
 .gnwrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
 .gnsvg{width:100%;max-width:300px;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
 .gnsvg rect.cell{fill:var(--acc);fill-opacity:.18;stroke:var(--acc);stroke-width:2}
@@ -277,6 +281,11 @@ textarea:focus{border-color:var(--acc)}
 <div class="chips" id="srcPrice"></div>
 <p class="note">Seçtiğin kaynaklar arasındaki en ucuz fiyat hesaplarda kullanılır.</p>
 <p class="note" id="halNote"></p>
+</section>
+<section class="card" id="adminStat" hidden>
+<h2>Yönetici özeti</h2>
+<p class="note" style="margin:0 0 8px">Bunu sadece sen görüyorsun.</p>
+<div class="stats" id="statGrid"></div>
 </section>
 <section class="card" id="bulkCard" hidden>
 <h2>Toplu fiyat girişi</h2>
@@ -757,6 +766,16 @@ var h='<p style="margin:0 0 6px"><b></b></p><p class="note" style="margin:0 0 6p
 var d=$("algInfo");d.innerHTML=h;var ps=d.querySelectorAll("p");ps[0].firstChild.textContent=a[1];ps[1].textContent="Kaynak: "+a[2]+".";ps[2].textContent="Mutfakta: "+a[3];
 ps[3].textContent=ings.length?"Listedeki malzemelerden içerenler: "+ings.join(", ")+".":"Listedeki malzemelerde bilinen bir kaynağı yok.";
 ps[4].textContent=inR+" / "+tot+" klasik tarifte bu alerjen var."}
+
+/* ---------- YÖNETİCİ ÖZETİ ---------- */
+var PRODN=null,prodLoading=false;
+function loadProdN(){if(!ADMIN||guest||prodLoading)return;prodLoading=true;sb.from("products").select("id",{count:"exact",head:true}).then(function(r){prodLoading=false;if(!r.error&&r.count!=null){PRODN=r.count;drawStats()}},function(){prodLoading=false})}
+function drawStats(){var c=$("adminStat");c.hidden=!ADMIN;if(!ADMIN)return;
+var keys=Object.keys(I).filter(function(k){return !I[k][2]}),n=keys.length,vm=keys.filter(function(k){return MD[k]}).length,vk=keys.filter(function(k){return MS[k]}).length,vh=keys.filter(function(k){return LIVE[k]}).length;
+var rec=BASE.length,cats={};BASE.forEach(function(r){cats[r.c]=1});
+var rows=[[n,"ürün (malzeme)"],[rec,"hazır tarif, "+Object.keys(cats).length+" kategori"],[vm+vk+vh,"doğrulanmış fiyat (Metro "+vm+", market "+vk+", hâl "+vh+")"],[PRODN==null?"…":PRODN,"markalı ürün kaydı"]];
+var g=$("statGrid");g.innerHTML="";rows.forEach(function(r){var d=document.createElement("div");d.className="astat";var b=document.createElement("b");b.textContent=r[0];var sp=document.createElement("span");sp.textContent=r[1];d.appendChild(b);d.appendChild(sp);g.appendChild(d)});
+if(PRODN==null)loadProdN()}
 function draw(){drawSources();if(tab==="profile")drawProfile();else if(tab==="calc")drawCalc();else if(tab==="price")drawPrices();else if(tab==="rec")drawRecs();else if(tab==="guide")drawGuide();else if(curShop)drawShop();else drawLib()}
 function halAge(){return HALD?Math.max(0,Math.floor((Date.now()-new Date(HALD).getTime())/864e5)):0}
 function drawSources(){var hw=$("halWarn");if(hw){var ag=halAge();hw.hidden=!(sel["Hâl"]&&HALD&&ag>7);hw.textContent="Dikkat: hâl fiyatları "+ag+" gün önceki veri. Bursa Belediyesi hâl verisini güncellemedi, maliyet eski fiyatla hesaplanıyor."}["srcCalc","srcPrice"].forEach(function(id){var el=$(id);el.innerHTML="";S.forEach(function(s){var b=document.createElement("button");b.className="chip";b.textContent=s;b.setAttribute("aria-pressed",!!sel[s]);b.onclick=function(){sel[s]=!sel[s];savePrefs();draw()};el.appendChild(b)})})}
@@ -847,7 +866,7 @@ return md+" Market sütunundaki mağaza adlı fiyatlar ("+Object.keys(st).join("
 function drawHalNote(){var el=$("halNote");if(!HALD){el.textContent="Fiyatlar şimdilik örnek veridir."+mNote();return}
 el.innerHTML='Yeşil işaretli hâl fiyatları <a href="https://acikyesil.bursa.bel.tr/dataset/hal-fiyatlari" target="_blank" rel="noopener">Bursa Büyükşehir Belediyesi Açık Veri Platformu</a>\'ndan, <a href="https://acikyesil.bursa.bel.tr/license" target="_blank" rel="noopener">Bursa Açık Veri Lisansı</a> ile alınır (min ve max fiyatın ortalaması). Hâl verisinin tarihi: <b></b>. Diğer fiyatlar şimdilik örnektir.'+mNote();
 el.querySelector("b").textContent=dt(HALD);var ag=halAge();if(ag>7)el.insertAdjacentHTML("beforeend",' <b style="color:var(--warn)">Dikkat: bu veri '+ag+' gün önceki, Bursa Belediyesi hâl verisini güncellemedi. Hâl fiyatları güncel olmayabilir.</b>')}
-function drawPrices(){drawHalNote();$("bulkCard").hidden=!ADMIN;var fl=["Tümü","Takip ettiklerin","Zamlananlar","Kampanyalı"],pf=$("pf");pf.innerHTML="";
+function drawPrices(){drawHalNote();$("bulkCard").hidden=!ADMIN;drawStats();var fl=["Tümü","Takip ettiklerin","Zamlananlar","Kampanyalı"],pf=$("pf");pf.innerHTML="";
 fl.forEach(function(x){var b=document.createElement("button");b.className="chip";b.textContent=x;b.setAttribute("aria-pressed",x===pfil);b.onclick=function(){pfil=x;drawPrices()};pf.appendChild(b)});
 var f=fold(gqv().trim()),keys=Object.keys(I).filter(function(k){if(f&&sScore(k,f)<0)return false;if(pfil==="Takip ettiklerin")return store.fav.indexOf(k)>-1;if(pfil==="Zamlananlar"){var cz=chg(k);return cz!=null&&cz>=20}if(pfil==="Kampanyalı")return !!CAMP[k];return true});
 keys.sort(function(a,b){var fa=store.fav.indexOf(a)>-1,fb=store.fav.indexOf(b)>-1;if(fa!==fb)return fa?-1:1;return a.localeCompare(b,"tr")});
@@ -917,7 +936,7 @@ busy(btn,async function(){try{var rows=bulkRows.map(function(o){return{ingredien
 var r=await sb.rpc("bulk_price_save",{p_source:src,p_store:store,p_rows:rows});if(r.error)throw r.error;
 var ks=bulkRows.map(function(o){return o.k}),g=await sb.from("prices").select("*").in("ingredient",ks);
 if(g.data)g.data.forEach(function(p){I[p.ingredient]=[p.unit,[num(p.hal),num(p.metro),num(p.market)]];if(p.metro_date&&p.metro!=null)MD[p.ingredient]=p.metro_date;if(p.market_store&&p.market!=null)MS[p.ingredient]={store:p.market_store,date:p.market_date}});
-toast(r.data+" fiyat kaydedildi.");$("bkText").value="";$("bkOut").innerHTML="";bulkRows=[];btn.disabled=true;drawPrices()}
+PRODN=null;toast(r.data+" fiyat kaydedildi.");$("bkText").value="";$("bkOut").innerHTML="";bulkRows=[];btn.disabled=true;drawPrices()}
 catch(e){fail(e)}})};
 
 /* ---------- TARİFLER ---------- */
