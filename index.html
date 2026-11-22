@@ -163,6 +163,8 @@ textarea:focus{border-color:var(--acc)}
 .astat{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .astat b{display:block;font-size:26px;font-family:var(--serif,inherit);line-height:1.1}
 .astat span{display:block;color:var(--mut);font-size:13px}
+.chk{display:flex;gap:10px;align-items:flex-start;margin:12px 0 0;font-weight:500;font-size:14px;color:var(--ink);cursor:pointer}
+.chk input{flex:0 0 22px;width:22px;height:22px;min-height:0;margin:1px 0 0;padding:0;accent-color:var(--acc)}
 .gnwrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
 .gnsvg{width:100%;max-width:300px;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
 .gnsvg rect.cell{fill:var(--acc);fill-opacity:.18;stroke:var(--acc);stroke-width:2}
@@ -205,7 +207,7 @@ textarea:focus{border-color:var(--acc)}
 <div id="loading" class="empty">Yükleniyor…</div>
 <div id="app" hidden>
 <header class="topbar"><input id="gq" type="search" placeholder="Yemek ara" aria-label="Ara" autocomplete="off"><button class="avatar" id="avatar" aria-label="Profil"></button></header>
-<div class="banner guestnote"><b>Demo modundasın</b><p>Hesap, tarif ve işletme kaydetmek için giriş yap ya da ücretsiz kayıt ol.</p><button class="go" id="guestLogin">Giriş yap / Kayıt ol</button></div>
+<div class="banner guestnote"><b>Demo modundasın · Geliştirme aşamasındayız</b><p>Fiyatlar şimdilik örnek. Fiyatlar sekmesinden kendi faturandaki fiyatları girip hesapları gerçek maliyete yaklaştırabilirsin. Hesap, tarif ve işletme kaydetmek için giriş yap ya da ücretsiz kayıt ol.</p><button class="go" id="guestLogin">Giriş yap / Kayıt ol</button></div>
 <h1 id="ttl"></h1>
 <p class="sub" id="tsub"></p>
 
@@ -281,6 +283,17 @@ textarea:focus{border-color:var(--acc)}
 <div class="chips" id="srcPrice"></div>
 <p class="note">Seçtiğin kaynaklar arasındaki en ucuz fiyat hesaplarda kullanılır.</p>
 <p class="note" id="halNote"></p>
+</section>
+<section class="card" id="fpCard" hidden>
+<h2>Kendi faturandan fiyat gir</h2>
+<p class="note" style="margin:0 0 8px">Uygulama geliştirme aşamasında ve listedeki fiyatlar şimdilik örnek. Faturandaki gerçek fiyatı girersen hesapların senin fiyatınla yapılır. İstersen fiyatı ortak veriye anonim katkı olarak da paylaşabilirsin, böylece herkesin hesabı daha doğru olur.</p>
+<label for="fpIng">Ürün</label><input id="fpIng" list="fpList" placeholder="Tereyağı, ayçiçek yağı…" autocomplete="off"><datalist id="fpList"></datalist>
+<div class="two"><div><label for="fpBrand">Marka (isteğe bağlı)</label><input id="fpBrand" placeholder="Yudum, Sütaş…" autocomplete="off"></div><div><label for="fpStore">Mağaza ya da tedarikçi</label><input id="fpStore" placeholder="Metro, toptancı…" autocomplete="off"></div></div>
+<div class="two"><div><label for="fpPrice">Paket fiyatı (TL)</label><input id="fpPrice" type="text" inputmode="decimal" placeholder="650" autocomplete="off"></div><div><label for="fpQty">Paket miktarı</label><input id="fpQty" placeholder="5 lt, 700 g, 30 adet" autocomplete="off"></div></div>
+<label for="fpDate">Fatura tarihi</label><input id="fpDate" type="date">
+<label class="chk"><input type="checkbox" id="fpShare"><span>Bu fiyatı (ürün, marka, tutar, mağaza ve tarih) kimliğim olmadan ortak fiyat verisine katkı olarak paylaşmayı kabul ediyorum. Fatura görseli ya da kişisel bilgi alınmaz.</span></label>
+<div class="add2"><button class="go" id="fpSave">Fiyatı kaydet</button></div>
+<p class="note" id="fpOut" style="margin:8px 0 0"></p>
 </section>
 <section class="card" id="adminStat" hidden>
 <h2>Yönetici özeti</h2>
@@ -400,7 +413,7 @@ textarea:focus{border-color:var(--acc)}
 <p class="note">Kütüphanen, tariflerin ve takip ettiğin ürünler hesabına kaydedilir ve sadece sana görünür. Aynı e-postayla her cihazdan girebilirsin.</p>
 </div>
 
-<p class="note">Fiyatlar şimdilik örnek veridir. Kütüphanen ve tariflerin hesabına kaydedilir, her cihazdan girebilirsin.</p>
+<p class="note">Uygulama geliştirme aşamasında, fiyatlar şimdilik örnek veridir. Kütüphanen ve tariflerin hesabına kaydedilir, her cihazdan girebilirsin.</p>
 </div>
 </main>
 <div class="toast" id="toast" hidden role="status"></div>
@@ -670,7 +683,7 @@ $("rGo").onclick=function(){var a=$("rPass").value,b=$("rPass2").value;if(a.leng
 busy($("rGo"),async function(){var r=await sb.auth.updateUser({password:a});if(r.error){$("rMsg").textContent=trErr(r.error);return}
 recovering=false;history.replaceState(null,"",HOME);$("rPass").value="";$("rPass2").value="";$("recoverView").hidden=true;toast("Şifren güncellendi.");loadAll()})};
 sb.auth.onAuthStateChange(function(ev,s){var u=s&&s.user;if(ev==="PASSWORD_RECOVERY"){user=u;showRecover();return}if(recovering&&u){user=u;showRecover();return}
-if(u){if(!user||user.id!==u.id){user=u;setTimeout(loadAll,0)}}else{user=null;if(!guest)showAuth()}});
+if(u){if(!user||user.id!==u.id){user=u;setTimeout(loadAll,0)}}else{user=null;if(!guest){if(/[?&]demo=1/.test(location.search)&&!window.__demoDone){window.__demoDone=1;loadGuest()}else showAuth()}}});
 $("logout").onclick=function(){sb.auth.signOut()};
 
 /* ---------- veri yükleme ---------- */
@@ -679,7 +692,7 @@ async function loadAll(){guest=false;document.body.classList.remove("guest");$("
 try{var res=await Promise.all([sb.from("prices").select("*"),sb.from("my_ingredients").select("*"),sb.from("my_recipes").select("*").order("created_at"),sb.from("shops").select("*").order("created_at"),sb.from("shop_recipes").select("*").order("saved_at"),sb.from("favorites").select("*"),sb.from("price_baseline").select("*")]);
 res.slice(0,6).forEach(function(r){if(r.error)throw r.error});
 I={};CAMP={};LIVE={};HALD=null;MS={};MD={};PB={};
-res[0].data.forEach(function(p){I[p.ingredient]=[p.unit,[num(p.hal),num(p.metro),num(p.market)]];if(p.metro_date&&p.metro!=null)MD[p.ingredient]=p.metro_date;if(p.market_store&&p.market!=null)MS[p.ingredient]={store:p.market_store,date:p.market_date};if(p.campaign)CAMP[p.ingredient]=p.campaign;if(p.hal_date){LIVE[p.ingredient]=1;if(!HALD||p.hal_date>HALD)HALD=p.hal_date}});
+BASEK={};res[0].data.forEach(function(p){BASEK[p.ingredient]=p.unit;I[p.ingredient]=[p.unit,[num(p.hal),num(p.metro),num(p.market)]];if(p.metro_date&&p.metro!=null)MD[p.ingredient]=p.metro_date;if(p.market_store&&p.market!=null)MS[p.ingredient]={store:p.market_store,date:p.market_date};if(p.campaign)CAMP[p.ingredient]=p.campaign;if(p.hal_date){LIVE[p.ingredient]=1;if(!HALD||p.hal_date>HALD)HALD=p.hal_date}});
 res[1].data.forEach(function(m){I[m.name]=[m.unit,[+m.price,+m.price,+m.price],1]});
 store.recipes=res[2].data.map(function(r){return{id:r.id,n:r.name,p:r.portions,it:r.items||[]}});
 store.shops=res[3].data.map(function(s){return{id:s.id,name:s.name,recipes:[]}});
@@ -689,7 +702,7 @@ if(!res[6].error&&res[6].data)res[6].data.forEach(function(p){PB[p.ingredient]={
 rebuildR();calc=null;curShop=null;
 if(!LP.lastScan||Date.now()-LP.lastScan>=SCAN_DAYS*864e5){LP.lastScan=Date.now();LP.dismissed=0;savePrefs()}
 $("who").textContent=user.email||"";$("avatar").textContent=((user.email||"?").charAt(0)).toLocaleUpperCase("tr");$("loading").hidden=true;$("app").hidden=false;$("bnav").hidden=false;
-drawBanner();go("calc");
+drawBanner();go("calc");deepLink();
 sb.rpc("is_admin").then(function(r){ADMIN=!r.error&&r.data===true;if(ADMIN&&tab==="price")drawPrices()});
 sb.from("announcements").select("*").order("id",{ascending:false}).limit(1).then(function(r){if(!r.error&&r.data&&r.data[0]){ANN=r.data[0];drawBanner()}})}
 catch(e){console.error(e);$("loading").textContent="Veriler yüklenemedi ("+e.message+"). Sayfayı yenileyip tekrar dene."}}
@@ -699,9 +712,9 @@ function exitGuest(){guest=false;document.body.classList.remove("guest");I={};CA
 async function loadGuest(){guest=true;document.body.classList.add("guest");$("authView").hidden=true;$("app").hidden=true;$("bnav").hidden=true;$("loading").hidden=false;$("loading").textContent="Yükleniyor…";
 try{var r=await sb.from("prices").select("*");if(r.error)throw r.error;if(!r.data||!r.data.length)throw new Error("fiyat listesi boş");
 I={};CAMP={};LIVE={};HALD=null;MS={};MD={};PB={};store={shops:[],recipes:[],fav:[]};
-r.data.forEach(function(p){I[p.ingredient]=[p.unit,[num(p.hal),num(p.metro),num(p.market)]];if(p.metro_date&&p.metro!=null)MD[p.ingredient]=p.metro_date;if(p.market_store&&p.market!=null)MS[p.ingredient]={store:p.market_store,date:p.market_date};if(p.campaign)CAMP[p.ingredient]=p.campaign;if(p.hal_date){LIVE[p.ingredient]=1;if(!HALD||p.hal_date>HALD)HALD=p.hal_date}});
-rebuildR();calc=null;curShop=null;user=null;
-$("avatar").textContent="Giriş";$("loading").hidden=true;$("app").hidden=false;$("bnav").hidden=false;drawBanner();go("calc")}
+BASEK={};r.data.forEach(function(p){BASEK[p.ingredient]=p.unit;I[p.ingredient]=[p.unit,[num(p.hal),num(p.metro),num(p.market)]];if(p.metro_date&&p.metro!=null)MD[p.ingredient]=p.metro_date;if(p.market_store&&p.market!=null)MS[p.ingredient]={store:p.market_store,date:p.market_date};if(p.campaign)CAMP[p.ingredient]=p.campaign;if(p.hal_date){LIVE[p.ingredient]=1;if(!HALD||p.hal_date>HALD)HALD=p.hal_date}});
+gpApply();rebuildR();calc=null;curShop=null;user=null;
+$("avatar").textContent="Giriş";$("loading").hidden=true;$("app").hidden=false;$("bnav").hidden=false;drawBanner();go("calc");deepLink()}
 catch(e){console.warn(e);guest=false;document.body.classList.remove("guest");showAuth();$("aMsg").textContent="Demo şu an açılamadı. Ücretsiz kayıt olarak devam edebilirsin."}}
 
 /* ---------- gezinme ---------- */
@@ -776,6 +789,34 @@ var rec=BASE.length,cats={};BASE.forEach(function(r){cats[r.c]=1});
 var rows=[[n,"ürün (malzeme)"],[rec,"hazır tarif, "+Object.keys(cats).length+" kategori"],[vm+vk+vh,"doğrulanmış fiyat (Metro "+vm+", market "+vk+", hâl "+vh+")"],[PRODN==null?"…":PRODN,"markalı ürün kaydı"]];if(USTAT){rows.push([USTAT.users,"kayıtlı kullanıcı"],[USTAT.new_today+" / "+USTAT.new_7d,"yeni kayıt (bugün / son 7 gün)"],[USTAT.active_7d,"son 7 günde giriş yapan"],[USTAT.shops+" / "+USTAT.own_recipes,"kaydedilen işletme / kendi tarifi"])}else rows.push(["…","kullanıcı sayıları yükleniyor"]);
 var g=$("statGrid");g.innerHTML="";rows.forEach(function(r){var d=document.createElement("div");d.className="astat";var b=document.createElement("b");b.textContent=r[0];var sp=document.createElement("span");sp.textContent=r[1];d.appendChild(b);d.appendChild(sp);g.appendChild(d)});
 if(PRODN==null)loadProdN()}
+
+/* ---------- KENDİ FATURAMDAN FİYAT ---------- */
+function slugify(t){return fold(t).replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")}
+var GP_KEY="mm_guest_prices";
+function gpLoad(){try{return JSON.parse(localStorage.getItem(GP_KEY)||"{}")}catch(e){return{}}}
+function gpSave(o){try{localStorage.setItem(GP_KEY,JSON.stringify(o))}catch(e){}}
+function gpApply(){var o=gpLoad();Object.keys(o).forEach(function(n){if(I[n]&&I[n][0]===o[n][0]&&!I[n][2])I[n]=[o[n][0],[o[n][1],o[n][1],o[n][1]],1]})}
+function drawFp(){var c=$("fpCard");c.hidden=!!ADMIN;if(ADMIN)return;
+var dl=$("fpList");if(!dl.childNodes.length||dl.dataset.n!=String(Object.keys(I).length)){dl.innerHTML="";dl.dataset.n=String(Object.keys(I).length);Object.keys(I).filter(function(k){return !I[k][2]||BASEK[k]}).sort(function(a,b){return a.localeCompare(b,"tr")}).forEach(function(k){var o=document.createElement("option");o.value=k;dl.appendChild(o)})}
+var d=$("fpDate");if(!d.value){var t=new Date();d.value=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0");d.max=d.value}}
+var BASEK={};
+$("fpSave").onclick=function(){var out=$("fpOut"),btn=this;out.textContent="";
+var nm=$("fpIng").value.trim(),f=fold(nm),keys=Object.keys(BASEK),k=keys.filter(function(x){return fold(x)===f})[0];
+if(!k){var part=keys.filter(function(x){return fold(x).indexOf(f)>-1});if(f&&part.length===1)k=part[0]}
+if(!k){out.textContent=nm?"Bu ürün listede yok. Listeden birini seç ya da adı tam yaz.":"Önce ürünü seç.";return}
+var price=bkNum($("fpPrice").value);if(!price||price<=0){out.textContent="Paket fiyatını yaz.";return}
+var qr=bkQty($("fpQty").value||"",BASEK[k]);if(qr.err){out.textContent="Paket miktarı: "+qr.err+". Örnek: 5 lt, 700 g, 30 adet.";return}
+var up=Math.round(price/qr.q*100)/100,share=$("fpShare").checked,store=$("fpStore").value.trim(),brand=$("fpBrand").value.trim(),day=$("fpDate").value;
+if(share&&!store){out.textContent="Paylaşmak için mağaza ya da tedarikçi adını yaz.";return}
+var cur=I[k]&&I[k][1],warn="";var ref=cur&&(cur[1]||cur[2]);if(ref&&(up/ref>5||up/ref<0.2))warn=" Dikkat: listedeki fiyattan çok farklı, paket miktarını kontrol ettiysen sorun yok.";
+busy(btn,async function(){try{
+if(!guest)await q(sb.from("my_ingredients").upsert({name:k,unit:BASEK[k],price:up},{onConflict:"owner,name"}));else{var g=gpLoad();g[k]=[BASEK[k],up];gpSave(g)}
+I[k]=[BASEK[k],[up,up,up],1];
+var msg=k+": "+tl(up)+"/"+BASEK[k]+" olarak kaydedildi, hesaplarında kullanılacak."+warn;
+if(share){var r=await sb.rpc("submit_price",{p_ingredient:k,p_brand:brand||null,p_pack_qty:qr.q,p_price:price,p_store:store,p_invoice_date:day});if(r.error)msg+=" Paylaşım gönderilemedi: "+r.error.message+".";else msg+=" Ortak veriye katkı için teşekkürler."}
+out.textContent=msg;$("fpPrice").value="";$("fpQty").value="";$("fpBrand").value="";$("fpIng").value="";drawPrices()}catch(e){fail(e)}})};
+function deepLink(){var m=location.search.match(/[?&]tarif=([^&]+)/);if(!m||deepLink.done)return;deepLink.done=1;var sl;try{sl=decodeURIComponent(m[1])}catch(e){return}
+var i=R.findIndex(function(r){return slugify(r.n)===sl});if(i>-1){go("calc");openRecipe(i)}}
 function draw(){drawSources();if(tab==="profile")drawProfile();else if(tab==="calc")drawCalc();else if(tab==="price")drawPrices();else if(tab==="rec")drawRecs();else if(tab==="guide")drawGuide();else if(curShop)drawShop();else drawLib()}
 function halAge(){return HALD?Math.max(0,Math.floor((Date.now()-new Date(HALD).getTime())/864e5)):0}
 function drawSources(){var hw=$("halWarn");if(hw){var ag=halAge();hw.hidden=!(sel["Hâl"]&&HALD&&ag>7);hw.textContent="Dikkat: hâl fiyatları "+ag+" gün önceki veri. Bursa Belediyesi hâl verisini güncellemedi, maliyet eski fiyatla hesaplanıyor."}["srcCalc","srcPrice"].forEach(function(id){var el=$(id);el.innerHTML="";S.forEach(function(s){var b=document.createElement("button");b.className="chip";b.textContent=s;b.setAttribute("aria-pressed",!!sel[s]);b.onclick=function(){sel[s]=!sel[s];savePrefs();draw()};el.appendChild(b)})})}
@@ -866,7 +907,7 @@ return md+" Market sütunundaki mağaza adlı fiyatlar ("+Object.keys(st).join("
 function drawHalNote(){var el=$("halNote");if(!HALD){el.textContent="Fiyatlar şimdilik örnek veridir."+mNote();return}
 el.innerHTML='Yeşil işaretli hâl fiyatları <a href="https://acikyesil.bursa.bel.tr/dataset/hal-fiyatlari" target="_blank" rel="noopener">Bursa Büyükşehir Belediyesi Açık Veri Platformu</a>\'ndan, <a href="https://acikyesil.bursa.bel.tr/license" target="_blank" rel="noopener">Bursa Açık Veri Lisansı</a> ile alınır (min ve max fiyatın ortalaması). Hâl verisinin tarihi: <b></b>. Diğer fiyatlar şimdilik örnektir.'+mNote();
 el.querySelector("b").textContent=dt(HALD);var ag=halAge();if(ag>7)el.insertAdjacentHTML("beforeend",' <b style="color:var(--warn)">Dikkat: bu veri '+ag+' gün önceki, Bursa Belediyesi hâl verisini güncellemedi. Hâl fiyatları güncel olmayabilir.</b>')}
-function drawPrices(){drawHalNote();$("bulkCard").hidden=!ADMIN;drawStats();var fl=["Tümü","Takip ettiklerin","Zamlananlar","Kampanyalı"],pf=$("pf");pf.innerHTML="";
+function drawPrices(){drawHalNote();drawFp();$("bulkCard").hidden=!ADMIN;drawStats();var fl=["Tümü","Takip ettiklerin","Zamlananlar","Kampanyalı"],pf=$("pf");pf.innerHTML="";
 fl.forEach(function(x){var b=document.createElement("button");b.className="chip";b.textContent=x;b.setAttribute("aria-pressed",x===pfil);b.onclick=function(){pfil=x;drawPrices()};pf.appendChild(b)});
 var f=fold(gqv().trim()),keys=Object.keys(I).filter(function(k){if(f&&sScore(k,f)<0)return false;if(pfil==="Takip ettiklerin")return store.fav.indexOf(k)>-1;if(pfil==="Zamlananlar"){var cz=chg(k);return cz!=null&&cz>=20}if(pfil==="Kampanyalı")return !!CAMP[k];return true});
 keys.sort(function(a,b){var fa=store.fav.indexOf(a)>-1,fb=store.fav.indexOf(b)>-1;if(fa!==fb)return fa?-1:1;return a.localeCompare(b,"tr")});
