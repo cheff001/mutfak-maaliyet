@@ -173,6 +173,7 @@ button:disabled{opacity:.6;cursor:wait}
 <h2>Nereden alışveriş yapıyorsun?</h2>
 <div class="chips" id="srcPrice"></div>
 <p class="note">Seçtiğin kaynaklar arasındaki en ucuz fiyat hesaplarda kullanılır.</p>
+<p class="note" id="halNote"></p>
 </section>
 <section class="card">
 <input id="fq" type="search" placeholder="Ürün ara: domates, tereyağı…" aria-label="Ürün ara" autocomplete="off">
@@ -310,7 +311,7 @@ var H6={"Tereyağı":.7,"Yumurta":.68,"Dana kıyma":.78,"Kuzu kıyma":.8,"Dana k
 var VER=3,NEWS={r:["Çılbır","Mantı","Hünkar beğendi","Kısır","Revani","Tavuk kanat"],i:["Kaşar","Mantar","Tahin","Asma yaprağı"]};
 
 var SCAN_DAYS=90,TH=25;
-var I={},CAMP={};
+var I={},CAMP={},LIVE={},HALD=null;
 var SB_URL="https://ttpajmtrpdyrowkyjdlc.supabase.co",SB_KEY="sb_publishable_g1P-Cwj5XyeQoSqzNJ0Jfg_dlCth701";
 var sb=supabase.createClient(SB_URL,SB_KEY);
 var LPK="mm_prefs",LP={};try{LP=JSON.parse(localStorage.getItem(LPK))||{}}catch(e){}
@@ -365,8 +366,8 @@ function fromSR(r){return{id:r.id,n:r.name,p:r.portions,it:r.items||[],mar:r.mar
 async function loadAll(){$("authView").hidden=true;$("app").hidden=true;$("bnav").hidden=true;$("loading").hidden=false;$("loading").textContent="Yükleniyor…";
 try{var res=await Promise.all([sb.from("prices").select("*"),sb.from("my_ingredients").select("*"),sb.from("my_recipes").select("*").order("created_at"),sb.from("shops").select("*").order("created_at"),sb.from("shop_recipes").select("*").order("saved_at"),sb.from("favorites").select("*")]);
 res.forEach(function(r){if(r.error)throw r.error});
-I={};CAMP={};
-res[0].data.forEach(function(p){I[p.ingredient]=[p.unit,[num(p.hal),num(p.metro),num(p.pazar),num(p.market)]];if(p.campaign)CAMP[p.ingredient]=p.campaign});
+I={};CAMP={};LIVE={};HALD=null;
+res[0].data.forEach(function(p){I[p.ingredient]=[p.unit,[num(p.hal),num(p.metro),num(p.pazar),num(p.market)]];if(p.campaign)CAMP[p.ingredient]=p.campaign;if(p.hal_date){LIVE[p.ingredient]=1;if(!HALD||p.hal_date>HALD)HALD=p.hal_date}});
 res[1].data.forEach(function(m){I[m.name]=[m.unit,[+m.price,+m.price,+m.price,+m.price],1]});
 store.recipes=res[2].data.map(function(r){return{id:r.id,n:r.name,p:r.portions,it:r.items||[]}});
 store.shops=res[3].data.map(function(s){return{id:s.id,name:s.name,recipes:[]}});
@@ -461,7 +462,10 @@ async function addShop(n){n=n.trim();if(!n)return null;try{var d=await q(sb.from
 
 /* ---------- FİYATLAR ---------- */
 function chg(n){return (1/(H6[n]||.92)-1)*100}
-function drawPrices(){var fl=["Tümü","Takip ettiklerin","Zamlananlar","Kampanyalı"],pf=$("pf");pf.innerHTML="";
+function drawHalNote(){var el=$("halNote");if(!HALD){el.textContent="Hâl, Metro, pazar ve market fiyatları şimdilik örnek veridir.";return}
+el.innerHTML='Yeşil işaretli hâl fiyatları <a href="https://acikyesil.bursa.bel.tr/dataset/hal-fiyatlari" target="_blank" rel="noopener">Bursa Büyükşehir Belediyesi Açık Veri Platformu</a>\'ndan, <a href="https://acikyesil.bursa.bel.tr/license" target="_blank" rel="noopener">Bursa Açık Veri Lisansı</a> ile alınır (min ve max fiyatın ortalaması). Hâl verisinin tarihi: <b></b>. Diğer fiyatlar şimdilik örnektir.';
+el.querySelector("b").textContent=dt(HALD)}
+function drawPrices(){drawHalNote();var fl=["Tümü","Takip ettiklerin","Zamlananlar","Kampanyalı"],pf=$("pf");pf.innerHTML="";
 fl.forEach(function(x){var b=document.createElement("button");b.className="chip";b.textContent=x;b.setAttribute("aria-pressed",x===pfil);b.onclick=function(){pfil=x;drawPrices()};pf.appendChild(b)});
 var f=fold($("fq").value.trim()),keys=Object.keys(I).filter(function(k){if(f&&fold(k).indexOf(f)<0)return false;if(pfil==="Takip ettiklerin")return store.fav.indexOf(k)>-1;if(pfil==="Zamlananlar")return !I[k][2]&&chg(k)>=20;if(pfil==="Kampanyalı")return !!CAMP[k];return true});
 keys.sort(function(a,b){var fa=store.fav.indexOf(a)>-1,fb=store.fav.indexOf(b)>-1;if(fa!==fb)return fa?-1:1;return a.localeCompare(b,"tr")});
@@ -473,7 +477,7 @@ var st=r.querySelector(".star");st.textContent=fav?"★":"☆";st.setAttribute("
 st.onclick=function(){toggleFav(k,st)};
 r.querySelector(".nm").textContent=k;if(CAMP[k])r.querySelector(".nm").insertAdjacentHTML("beforeend",'<span class="tag"></span>'),r.querySelector(".tag").textContent=CAMP[k]+" kampanya";
 var ms=r.querySelectorAll(".meta");
-ms[0].textContent=d[2]?"Senin girdiğin fiyat":S.map(function(s,j){return s+" "+(d[1][j]==null?"yok":Math.round(d[1][j]*10)/10)}).join(" · ");
+ms[0].textContent=d[2]?"Senin girdiğin fiyat":S.map(function(s,j){return s+" "+(d[1][j]==null?"yok":Math.round(d[1][j]*10)/10)+(j===0&&LIVE[k]?" ✓":"")}).join(" · ");if(LIVE[k])ms[0].insertAdjacentHTML("afterbegin",'<span style="color:var(--ok);font-weight:700">Güncel hâl · </span>');
 r.querySelector(".price").textContent=b?tl(b.p)+"/"+d[0]:"—";
 if(d[2])ms[1].textContent="";else{var c=chg(k);ms[1].className=c>=20?"rise":c<0?"down":"meta";ms[1].style.fontSize="13px";ms[1].textContent="6 ayda "+(c>=0?"+":"")+"%"+Math.round(c)}
 el.appendChild(r)})}
