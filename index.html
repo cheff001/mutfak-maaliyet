@@ -296,7 +296,7 @@ textarea:focus{border-color:var(--acc)}
 <div class="chips" id="srcPrice"></div>
 <p class="note">Seçtiğin kaynaklar arasındaki en ucuz fiyat hesaplarda kullanılır.</p>
 <p class="note" id="halNote"></p>
-<section class="card" id="zamCard">
+<section class="card" id="zamCard" hidden>
 <h2>Zam uyarıları <span class="meta" style="font-weight:700;border:1px solid var(--line);border-radius:8px;padding:1px 7px;margin-left:6px">Pro ön izleme</span></h2>
 <p class="note" style="margin:0 0 8px" id="zamNote">Yükleniyor…</p>
 <div id="zamList"></div>
@@ -732,7 +732,7 @@ rebuildR();calc=null;curShop=null;
 if(!LP.lastScan||Date.now()-LP.lastScan>=SCAN_DAYS*864e5){LP.lastScan=Date.now();LP.dismissed=0;savePrefs()}
 $("who").textContent=user.email||"";setAv();$("loading").hidden=true;$("app").hidden=false;$("bnav").hidden=false;
 drawBanner();go("calc");deepLink();
-sb.rpc("is_admin").then(function(r){ADMIN=!r.error&&r.data===true;try{if(ADMIN)localStorage.setItem("mm_notrack","1")}catch(e){}if(ADMIN&&tab==="price")drawPrices()});
+sb.rpc("is_admin").then(function(r){ADMIN=!r.error&&r.data===true;if(ADMIN)drawZam();try{if(ADMIN)localStorage.setItem("mm_notrack","1")}catch(e){}if(ADMIN&&tab==="price")drawPrices()});
 sb.from("announcements").select("*").order("id",{ascending:false}).limit(1).then(function(r){if(!r.error&&r.data&&r.data[0]){ANN=r.data[0];drawBanner()}})}
 catch(e){console.error(e);$("loading").textContent="Veriler yüklenemedi ("+e.message+"). Sayfayı yenileyip tekrar dene."}}
 
@@ -970,8 +970,8 @@ function mdNote(){var ks=Object.keys(MD);if(!ks.length)return"";var last=ks.redu
 function mNote(){var md=mdNote();var ks=Object.keys(MS);if(!ks.length)return md;var st={},last=null;ks.forEach(function(k){st[MS[k].store]=1;if(MS[k].date&&(!last||MS[k].date>last))last=MS[k].date});
 return md+" Market sütunundaki mağaza adlı fiyatlar ("+Object.keys(st).join(", ")+") mağaza rafından elle kontrol edilerek girilmiştir"+(last?", son kontrol: "+dt(last):"")+".";}
 var ZAM=null,zamLoading=false;
-function loadZam(){if(zamLoading)return;zamLoading=true;sb.rpc("price_changes",{p_days:7,p_min:5}).then(function(r){zamLoading=false;ZAM=r.error?[]:(r.data||[]);drawZam()})}
-function drawZam(){var c=$("zamCard");if(!c)return;if(ZAM==null){loadZam();return}var l=$("zamList");l.innerHTML="";
+function loadZam(){if(zamLoading||!ADMIN)return;zamLoading=true;sb.rpc("price_changes",{p_days:7,p_min:5}).then(function(r){zamLoading=false;ZAM=r.error?[]:(r.data||[]);drawZam()})}
+function drawZam(){var c=$("zamCard");if(!c)return;c.hidden=!ADMIN;if(!ADMIN)return;if(ZAM==null){loadZam();return}var l=$("zamList");l.innerHTML="";
 if(!ZAM.length){$("zamNote").textContent="Son 7 günde yüzde 5'ten büyük fiyat değişimi yok. Fiyat geçmişi biriktikçe zam ve indirimler burada görünür.";return}
 $("zamNote").textContent="Son 7 günde yüzde 5 ya da daha fazla değişen malzemeler ve etkilenen tarifler.";
 var SN={hal:"Hâl",metro:"Metro",market:"Market"};
