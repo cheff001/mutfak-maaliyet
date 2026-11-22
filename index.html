@@ -723,7 +723,7 @@ rebuildR();calc=null;curShop=null;
 if(!LP.lastScan||Date.now()-LP.lastScan>=SCAN_DAYS*864e5){LP.lastScan=Date.now();LP.dismissed=0;savePrefs()}
 $("who").textContent=user.email||"";$("avatar").textContent=((user.email||"?").charAt(0)).toLocaleUpperCase("tr");$("loading").hidden=true;$("app").hidden=false;$("bnav").hidden=false;
 drawBanner();go("calc");deepLink();
-sb.rpc("is_admin").then(function(r){ADMIN=!r.error&&r.data===true;if(ADMIN&&tab==="price")drawPrices()});
+sb.rpc("is_admin").then(function(r){ADMIN=!r.error&&r.data===true;try{if(ADMIN)localStorage.setItem("mm_notrack","1")}catch(e){}if(ADMIN&&tab==="price")drawPrices()});
 sb.from("announcements").select("*").order("id",{ascending:false}).limit(1).then(function(r){if(!r.error&&r.data&&r.data[0]){ANN=r.data[0];drawBanner()}})}
 catch(e){console.error(e);$("loading").textContent="Veriler yüklenemedi ("+e.message+"). Sayfayı yenileyip tekrar dene."}}
 
@@ -842,7 +842,7 @@ var i=R.findIndex(function(r){return slugify(r.n)===sl});if(i>-1){go("calc");ope
 function refName(){try{var q=(location.search.match(/[?&](?:utm_source|ref)=([^&]+)/)||[])[1];var h=q?decodeURIComponent(q).toLowerCase():"";if(!h&&document.referrer){var u=new URL(document.referrer);if(u.host===location.host)return "direkt";h=u.host.toLowerCase()}
 var m=[["google","google"],["bing","bing"],["instagram","instagram"],["facebook","facebook"],["fb.","facebook"],["whatsapp","whatsapp"],["wa.me","whatsapp"],["twitter","twitter"],["t.co","twitter"],["youtube","youtube"],["youtu.be","youtube"],["tiktok","tiktok"]];
 for(var i=0;i<m.length;i++)if(h.indexOf(m[i][0])>-1)return m[i][1];return h?"diger":"direkt"}catch(e){return "direkt"}}
-function track(kind,path){try{var k="mm_t_"+kind+(path||"");if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1")}catch(e){}
+function track(kind,path){try{if(localStorage.getItem("mm_notrack"))return;var k="mm_t_"+kind+(path||"");if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1")}catch(e){}
 try{sb.rpc("track_view",{p_kind:kind,p_path:path||"",p_ref:refName()}).then(function(){},function(){})}catch(e){}}
 /* ---------- GELEN FATURA FİYATLARI (yönetici) ---------- */
 var REPS=null,repLoading=false,TRAF=null;
