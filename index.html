@@ -9,6 +9,13 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10191b;--card:#182427;--ink:#e6eef0;--mut:#93a8ad;--line:#2b3c40;--acc:#4fc3b8;--accbg:#173a38;--warn:#f4b45f;--warnbg:#3b2c14;--ok:#6fd39b;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#10191b;--card:#182427;--ink:#e6eef0;--mut:#93a8ad;--line:#2b3c40;--acc:#4fc3b8;--accbg:#173a38;--warn:#f4b45f;--warnbg:#3b2c14;--ok:#6fd39b;color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+.topbar{position:sticky;top:0;z-index:6;display:flex;gap:10px;align-items:center;background:var(--bg);padding:10px 0 8px;margin:-6px 0 6px}
+.topbar input{flex:1;border-radius:999px;padding:10px 16px;background:var(--card)}
+.avatar{flex:none;width:42px;height:42px;border-radius:50%;border:0;background:var(--acc);color:var(--bg);font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stat div{background:var(--bg);border-radius:10px;padding:10px;text-align:center}
+.stat b{display:block;font-size:22px}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Trebuchet MS","Segoe UI",system-ui,sans-serif}
 main{max-width:640px;margin:0 auto;padding:18px 14px 110px}
 h1{font-size:26px;margin:4px 0 2px;letter-spacing:-.4px}
@@ -101,6 +108,7 @@ button:disabled{opacity:.6;cursor:wait}
 </div>
 <div id="loading" class="empty">Yükleniyor…</div>
 <div id="app" hidden>
+<header class="topbar"><input id="gq" type="search" placeholder="Yemek ara" aria-label="Ara" autocomplete="off"><button class="avatar" id="avatar" aria-label="Profil"></button></header>
 <h1 id="ttl"></h1>
 <p class="sub" id="tsub"></p>
 
@@ -108,8 +116,8 @@ button:disabled{opacity:.6;cursor:wait}
 <div id="calcView">
 <div id="calcEmpty">
 <section class="card">
-<input id="pq" type="search" placeholder="Yemek ara: pilav, köfte, çorba…" aria-label="Hesaplanacak yemeği ara" autocomplete="off">
-<div id="pick" class="list" style="margin-top:6px"></div>
+<p class="note" id="pickNote" style="margin:0 0 4px"></p>
+<div id="pick" class="list"></div>
 <button class="ghost" id="blank">+ Boş hesap başlat</button>
 </section>
 </div>
@@ -176,8 +184,7 @@ button:disabled{opacity:.6;cursor:wait}
 <p class="note" id="halNote"></p>
 </section>
 <section class="card">
-<input id="fq" type="search" placeholder="Ürün ara: domates, tereyağı…" aria-label="Ürün ara" autocomplete="off">
-<div class="chips" id="pf" style="margin:10px 0 4px"></div>
+<div class="chips" id="pf" style="margin:0 0 4px"></div>
 <div id="plist"></div>
 </section>
 </div>
@@ -186,8 +193,7 @@ button:disabled{opacity:.6;cursor:wait}
 <div id="recView" hidden>
 <div id="banner"></div>
 <section class="card">
-<input id="q" type="search" placeholder="Tarif ara: pilav, köfte, çorba…" aria-label="Tarif ara" autocomplete="off">
-<div class="chips" id="cats" style="margin:10px 0"></div>
+<div class="chips" id="cats" style="margin:0 0 10px"></div>
 <div id="results" class="list"></div>
 </section>
 </div>
@@ -212,9 +218,15 @@ button:disabled{opacity:.6;cursor:wait}
 <button class="ghost warnb" id="shopDel">İşletmeyi sil</button>
 </section>
 </div>
-<section class="card" id="account" hidden>
-<div class="hd"><div><div class="meta">Hesabın</div><div class="nm" id="who"></div></div><button class="small" id="logout">Çıkış yap</button></div>
+<div id="profileView" hidden>
+<section class="card">
+<div class="meta">Giriş yapılan hesap</div>
+<div class="nm" id="who" style="font-size:18px;word-break:break-all"></div>
+<div class="stat"><div><b id="stShops">0</b><span class="meta">işletme</span></div><div><b id="stLib">0</b><span class="meta">kayıtlı yemek</span></div><div><b id="stOwn">0</b><span class="meta">tarifim</span></div></div>
+<button class="ghost warnb" id="logout">Çıkış yap</button>
 </section>
+<p class="note">Kütüphanen, tariflerin ve takip ettiğin ürünler hesabına kaydedilir ve sadece sana görünür. Aynı e-postayla her cihazdan girebilirsin.</p>
+</div>
 
 <p class="note">Fiyatlar şimdilik örnek veridir. Kütüphanen ve tariflerin hesabına kaydedilir, her cihazdan girebilirsin.</p>
 </div>
@@ -305,10 +317,44 @@ var RAW=[
 "Tatlı|İrmik helvası|6|İrmik:250,Tereyağı:150,Şeker:250,Süt:500",
 "Tatlı|Muhallebi|6|Süt:1000,Şeker:180,Nişasta:60,Un:30",
 "Tatlı|Supangle|6|Süt:1000,Şeker:200,Kakao:40,Nişasta:50,Un:40,Tereyağı:30",
-"Tatlı|Revani|12|Yumurta:4,Şeker:800,İrmik:200,Un:120,Yoğurt:200,Ayçiçek yağı:100,Kabartma tozu:10,Limon:1"
+"Tatlı|Revani|12|Yumurta:4,Şeker:800,İrmik:200,Un:120,Yoğurt:200,Ayçiçek yağı:100,Kabartma tozu:10,Limon:1",
+"İtalyan|Spagetti Bolonez|4|Makarna:400,Dana kıyma:400,Soğan:120,Havuç:80,Sarımsak:10,Domates:500,Salça:30,Zeytinyağı:40,Parmesan:40,Tuz:8",
+"İtalyan|Spagetti Carbonara|4|Makarna:400,Yumurta:4,Parmesan:100,Dana füme:150,Karabiber:3,Tuz:6",
+"İtalyan|Fettuccine Alfredo|4|Makarna:400,Tereyağı:60,Krema:300,Parmesan:100,Sarımsak:5,Tuz:6",
+"İtalyan|Penne Arrabbiata|4|Makarna:400,Domates:700,Sarımsak:15,Pul biber:4,Zeytinyağı:50,Maydanoz:20,Tuz:6",
+"İtalyan|Pizza Margherita|2|Un:300,Maya:5,Zeytinyağı:20,Domates:250,Mozzarella:200,Fesleğen:10,Tuz:6",
+"İtalyan|Lazanya|8|Lazanya yaprağı:500,Dana kıyma:600,Soğan:150,Domates:600,Salça:40,Süt:800,Un:70,Tereyağı:70,Mozzarella:250,Parmesan:80,Tuz:10",
+"İtalyan|Mantarlı risotto|4|Arborio pirinç:320,Mantar:300,Soğan:100,Tereyağı:60,Parmesan:80,Et suyu bulyon:2,Zeytinyağı:20,Tuz:5",
+"İtalyan|Bruschetta|4|Baget ekmek:1,Domates:400,Sarımsak:10,Fesleğen:10,Zeytinyağı:40,Tuz:3",
+"İtalyan|Minestrone çorbası|6|Kabak:200,Havuç:150,Patates:200,Soğan:150,Domates:400,Kuru fasulye:100,Makarna:100,Zeytinyağı:40,Parmesan:40,Tuz:10",
+"İtalyan|Tiramisu|8|Mascarpone:500,Yumurta:4,Şeker:120,Kedi dili bisküvi:300,Kahve:20,Kakao:15",
+"Fransız|Fransız soğan çorbası|4|Soğan:1000,Tereyağı:60,Un:20,Et suyu bulyon:2,Baget ekmek:1,Gravyer:150,Tuz:6",
+"Fransız|Kiş Loren|8|Un:250,Tereyağı:125,Yumurta:4,Krema:300,Süt:100,Dana füme:200,Gravyer:120,Tuz:5",
+"Fransız|Ratatouille|6|Patlıcan:400,Kabak:400,Kapya biber:300,Domates:600,Soğan:200,Sarımsak:15,Zeytinyağı:80,Fesleğen:10,Tuz:8",
+"Fransız|Krep|6|Un:250,Süt:500,Yumurta:3,Tereyağı:40,Şeker:20,Tuz:2",
+"Fransız|Krem brüle|6|Krema:500,Yumurta:6,Şeker:120",
+"Fransız|Kruk mösyö|2|Tost ekmeği dilimi:4,Dana füme:100,Gravyer:100,Tereyağı:30,Süt:150,Un:15",
+"Fransız|Patates graten|6|Patates:1200,Krema:400,Süt:200,Sarımsak:10,Tereyağı:30,Gravyer:120,Tuz:8",
+"Meksika|Tavuk taco|4|Tortilla:8,Tavuk but:500,Kırmızı soğan:100,Domates:200,Kişniş:20,Misket limonu:2,Kimyon:4,Pul biber:4,Ayçiçek yağı:30,Tuz:6",
+"Meksika|Etli burrito|4|Tortilla:4,Dana kıyma:400,Pirinç:200,Kırmızı fasulye konserve:300,Cheddar:150,Domates:200,Kırmızı soğan:80,Kimyon:4,Ayçiçek yağı:30,Tuz:8",
+"Meksika|Guacamole|4|Avokado:3,Misket limonu:2,Kırmızı soğan:60,Domates:150,Kişniş:15,Jalapeno:20,Tuz:3",
+"Meksika|Tavuklu quesadilla|2|Tortilla:4,Cheddar:200,Tavuk göğüs:200,Kapya biber:100,Ayçiçek yağı:15",
+"Meksika|Chili con carne|6|Dana kıyma:600,Kırmızı fasulye konserve:500,Domates:600,Soğan:200,Kapya biber:150,Sarımsak:15,Kimyon:6,Pul biber:6,Salça:40,Ayçiçek yağı:40,Tuz:10",
+"Meksika|Nachos|4|Tortilla cipsi:300,Cheddar:200,Jalapeno:50,Domates:150,Kırmızı soğan:60,Süzme yoğurt:150,Kişniş:10",
+"Meksika|Tavuk fajita|4|Tavuk göğüs:600,Kapya biber:300,Kırmızı soğan:200,Tortilla:8,Misket limonu:2,Kimyon:4,Pul biber:4,Ayçiçek yağı:40,Tuz:6",
+"Uzak Doğu|Tavuk teriyaki|4|Tavuk but:800,Teriyaki sos:150,Pirinç:300,Susam yağı:15,Taze soğan:40,Ayçiçek yağı:20",
+"Uzak Doğu|Sebzeli noodle|4|Yumurtalı noodle:400,Havuç:150,Lahana:250,Kapya biber:150,Taze soğan:50,Soya sosu:80,Susam yağı:20,Zencefil:15,Sarımsak:10,Ayçiçek yağı:30",
+"Uzak Doğu|Tavuklu fried rice|4|Pirinç:400,Tavuk göğüs:300,Yumurta:3,Bezelye:150,Havuç:100,Taze soğan:50,Soya sosu:60,Susam yağı:15,Ayçiçek yağı:40",
+"Uzak Doğu|Karidesli pad thai|4|Pirinç noodle:350,Karides:300,Yumurta:3,Yer fıstığı:60,Taze soğan:50,Misket limonu:2,Soya sosu:60,Şeker:30,Ayçiçek yağı:40",
+"Uzak Doğu|Tatlı ekşi tavuk|4|Tavuk göğüs:600,Nişasta:80,Yumurta:1,Kapya biber:200,Kırmızı soğan:100,Ketçap:120,Sirke:50,Şeker:60,Soya sosu:30,Ayçiçek yağı:300",
+"Uzak Doğu|Kung pao tavuk|4|Tavuk göğüs:600,Yer fıstığı:100,Kapya biber:150,Taze soğan:60,Sarımsak:15,Zencefil:15,Soya sosu:80,Sirke:20,Şeker:20,Nişasta:20,Pul biber:5,Ayçiçek yağı:40",
+"Uzak Doğu|Tavuk köri|4|Tavuk göğüs:600,Hindistan cevizi sütü:400,Köri tozu:20,Soğan:150,Sarımsak:10,Zencefil:15,Domates:200,Pirinç:300,Ayçiçek yağı:30,Tuz:6",
+"Uzak Doğu|Brokolili dana|4|Dana kuşbaşı:500,Brokoli:500,Soya sosu:80,Sarımsak:15,Zencefil:15,Nişasta:20,Şeker:15,Susam yağı:15,Ayçiçek yağı:30",
+"Uzak Doğu|Somonlu maki|4|Sushi pirinci:400,Nori yaprağı:4,Somon:250,Salatalık:150,Avokado:1,Pirinç sirkesi:60,Şeker:20,Tuz:5,Soya sosu:60",
+"Uzak Doğu|Tavuklu ramen|4|Yumurtalı noodle:400,Tavuk but:500,Yumurta:4,Soya sosu:80,Zencefil:20,Sarımsak:15,Taze soğan:60,Mantar:150,Susam yağı:15"
 ];
 var H6={"Tereyağı":.7,"Yumurta":.68,"Dana kıyma":.78,"Kuzu kıyma":.8,"Dana kuşbaşı":.8,"Zeytinyağı":.74,"Kakao":.62,"Beyaz peynir":.8,"Kaşar":.78,"Süt":.82,"Yoğurt":.83,"Süzme yoğurt":.83,"Ceviz":.85,"Tavuk göğüs":.84,"Tavuk but":.84,"Tavuk kanat":.84,"Sucuk":.8,"Pirinç":.86,"Un":.88,"Domates":1.1,"Sivri biber":1.05,"Kabak":1.08,"Patlıcan":1.06};
-var VER=3,NEWS={r:["Çılbır","Mantı","Hünkar beğendi","Kısır","Revani","Tavuk kanat"],i:["Kaşar","Mantar","Tahin","Asma yaprağı"]};
+var VER=4,NEWS={text:"İtalyan, Fransız, Meksika ve Uzak Doğu mutfaklarından 34 dünyaca sevilen yemek eklendi: pizza, lazanya, kiş, taco, burrito, teriyaki, pad thai, köri ve daha fazlası.",r:["Spagetti Bolonez", "Spagetti Carbonara", "Fettuccine Alfredo", "Penne Arrabbiata", "Pizza Margherita", "Lazanya", "Mantarlı risotto", "Bruschetta", "Minestrone çorbası", "Tiramisu", "Fransız soğan çorbası", "Kiş Loren", "Ratatouille", "Krep", "Krem brüle", "Kruk mösyö", "Patates graten", "Tavuk taco", "Etli burrito", "Guacamole", "Tavuklu quesadilla", "Chili con carne", "Nachos", "Tavuk fajita", "Tavuk teriyaki", "Sebzeli noodle", "Tavuklu fried rice", "Karidesli pad thai", "Tatlı ekşi tavuk", "Kung pao tavuk", "Tavuk köri", "Brokolili dana", "Somonlu maki", "Tavuklu ramen"]};
 
 var SCAN_DAYS=90,TH=25;
 var I={},CAMP={},LIVE={},HALD=null;
@@ -375,19 +421,21 @@ res[4].data.forEach(function(r){var s=shopById(r.shop_id);if(s)s.recipes.push(fr
 store.fav=res[5].data.map(function(f){return f.ingredient});
 rebuildR();calc=null;curShop=null;
 if(!LP.lastScan||Date.now()-LP.lastScan>=SCAN_DAYS*864e5){LP.lastScan=Date.now();LP.dismissed=0;savePrefs()}
-$("who").textContent=user.email||"";$("loading").hidden=true;$("app").hidden=false;$("bnav").hidden=false;
+$("who").textContent=user.email||"";$("avatar").textContent=((user.email||"?").charAt(0)).toLocaleUpperCase("tr");$("loading").hidden=true;$("app").hidden=false;$("bnav").hidden=false;
 drawBanner();go("calc")}
 catch(e){console.error(e);$("loading").textContent="Veriler yüklenemedi ("+e.message+"). Sayfayı yenileyip tekrar dene."}}
 
 /* ---------- gezinme ---------- */
 var tab="calc",calc=null,items=[],por=4,pick=null,armed=null,curShop=null,pendingShop=null,openIdx=-1,cat="Tümü",pfil="Tümü",missT=null;
-var TITLES={calc:["Maliyet hesapla","Bir yemek seç ya da boş hesap başlat, maliyeti anında gör."],price:["Ürün fiyatları","Hâl, Metro, pazar ve market fiyatlarını takip et."],rec:["Tarifler","Klasik tariflere göz at, menüne ilham al."],lib:["Kütüphane","İşletmelerin ve her birinde yapılan yemeklerin maliyetleri."]};
-function go(t){tab=t;var v={calc:"calcView",price:"priceView",rec:"recView",lib:curShop?"shopView":"libView"}[t];
-["calcView","priceView","recView","libView","shopView"].forEach(function(id){$(id).hidden=id!==v});
-$("account").hidden=!(t==="lib"&&!curShop);
+var PH={calc:"Hesaplanacak yemeği ara",price:"Ürün ara: domates, tereyağı…",rec:"Tarif ara: pizza, taco, köri…",lib:"İşletme ya da yemek ara",profile:""};
+function gqv(){return $("gq").value}
+var TITLES={profile:["Profil","Hesabın ve özetin."],calc:["Maliyet hesapla","Bir yemek seç ya da boş hesap başlat, maliyeti anında gör."],price:["Ürün fiyatları","Hâl, Metro, pazar ve market fiyatlarını takip et."],rec:["Tarifler","Klasik tariflere göz at, menüne ilham al."],lib:["Kütüphane","İşletmelerin ve her birinde yapılan yemeklerin maliyetleri."]};
+function go(t){if(t!==tab){$("gq").value="";openIdx=-1}tab=t;var v={calc:"calcView",price:"priceView",rec:"recView",lib:curShop?"shopView":"libView",profile:"profileView"}[t];
+["calcView","priceView","recView","libView","shopView","profileView"].forEach(function(id){$(id).hidden=id!==v});
+$("gq").placeholder=PH[t];$("gq").hidden=t==="profile";
 document.querySelectorAll(".bnav button").forEach(function(b){if(b.dataset.t===t)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
 $("ttl").textContent=TITLES[t][0];$("tsub").textContent=TITLES[t][1];draw()}
-function draw(){drawSources();if(tab==="calc")drawCalc();else if(tab==="price")drawPrices();else if(tab==="rec")drawRecs();else if(curShop)drawShop();else drawLib()}
+function draw(){drawSources();if(tab==="profile")drawProfile();else if(tab==="calc")drawCalc();else if(tab==="price")drawPrices();else if(tab==="rec")drawRecs();else if(curShop)drawShop();else drawLib()}
 function drawSources(){["srcCalc","srcPrice"].forEach(function(id){var el=$(id);el.innerHTML="";S.forEach(function(s){var b=document.createElement("button");b.className="chip";b.textContent=s;b.setAttribute("aria-pressed",!!sel[s]);b.onclick=function(){sel[s]=!sel[s];savePrefs();draw()};el.appendChild(b)})})}
 
 /* ---------- tarif listeleri ---------- */
@@ -403,14 +451,14 @@ b.onclick=onClick;return b}
 function logMiss(qs,kind){qs=qs.trim();if(qs.length<3)return;sb.from("missing_reports").insert({query:qs,kind:kind}).then(function(r){if(r.error)console.warn(r.error)})}
 
 /* ---------- HESAPLA ---------- */
-function startCalc(o){calc=o;por=o.p;items=o.it.map(cp);if(o.mar!=null)$("mar").value=o.mar;$("por").value=por;$("rtitle").value=o.n;$("shopMsg").textContent="";resetAdd();go("calc");window.scrollTo(0,0)}
+function startCalc(o){$("gq").value="";calc=o;por=o.p;items=o.it.map(cp);if(o.mar!=null)$("mar").value=o.mar;$("por").value=por;$("rtitle").value=o.n;$("shopMsg").textContent="";resetAdd();go("calc");window.scrollTo(0,0)}
 function openRecipe(i){var r=R[i];startCalc({n:r.n,p:r.p,it:r.it,src:r.own?"own":"rec",ri:i})}
 function openLib(sid,k){var r=shopById(sid).recipes[k];startCalc({n:r.n,p:r.p,it:r.it,mar:r.mar,src:"lib",lib:{s:sid,k:k}})}
-function drawPick(){var qs=$("pq").value,el=$("pick");el.innerHTML="";var list=matchRecs(qs).slice(0,qs.trim()?8:5);clearTimeout(missT);
+function drawPick(){var qs=gqv(),el=$("pick");el.innerHTML="";var list=matchRecs(qs).slice(0,qs.trim()?8:5);clearTimeout(missT);
 if(!list.length){el.innerHTML='<div class="empty">Bu isimde tarif yok, ekibe bildirildi. Boş hesap başlatıp kendin oluşturabilirsin.</div>';missT=setTimeout(function(){logMiss(qs,"yemek")},1500);return}
-if(!qs.trim())el.insertAdjacentHTML("beforeend",'<p class="note" style="margin:4px 0 0">Sık kullanılanlar</p>');
+$("pickNote").textContent=qs.trim()?(calc?"Aramayı temizlersen açık hesabına geri dönersin.":""):"Sık kullanılanlar. Başka bir yemek için üstten ara.";
 list.forEach(function(i){el.appendChild(recRow(i,function(){openRecipe(i)}))})}
-function drawCalc(){$("calcEmpty").hidden=!!calc;$("calcWork").hidden=!calc;if(!calc){drawPick();return}
+function drawCalc(){var searching=!!gqv().trim();$("calcEmpty").hidden=!!calc&&!searching;$("calcWork").hidden=!calc||searching;if(!calc||searching){drawPick();return}
 var lib=calc.src==="lib",sh=lib?shopById(calc.lib.s):null;
 if(lib&&(!sh||!sh.recipes[calc.lib.k])){calc=null;drawCalc();return}
 $("calcBack").hidden=!lib;if(lib)$("calcBack").textContent="← "+sh.name;
@@ -467,10 +515,10 @@ el.innerHTML='Yeşil işaretli hâl fiyatları <a href="https://acikyesil.bursa.
 el.querySelector("b").textContent=dt(HALD)}
 function drawPrices(){drawHalNote();var fl=["Tümü","Takip ettiklerin","Zamlananlar","Kampanyalı"],pf=$("pf");pf.innerHTML="";
 fl.forEach(function(x){var b=document.createElement("button");b.className="chip";b.textContent=x;b.setAttribute("aria-pressed",x===pfil);b.onclick=function(){pfil=x;drawPrices()};pf.appendChild(b)});
-var f=fold($("fq").value.trim()),keys=Object.keys(I).filter(function(k){if(f&&fold(k).indexOf(f)<0)return false;if(pfil==="Takip ettiklerin")return store.fav.indexOf(k)>-1;if(pfil==="Zamlananlar")return !I[k][2]&&chg(k)>=20;if(pfil==="Kampanyalı")return !!CAMP[k];return true});
+var f=fold(gqv().trim()),keys=Object.keys(I).filter(function(k){if(f&&fold(k).indexOf(f)<0)return false;if(pfil==="Takip ettiklerin")return store.fav.indexOf(k)>-1;if(pfil==="Zamlananlar")return !I[k][2]&&chg(k)>=20;if(pfil==="Kampanyalı")return !!CAMP[k];return true});
 keys.sort(function(a,b){var fa=store.fav.indexOf(a)>-1,fb=store.fav.indexOf(b)>-1;if(fa!==fb)return fa?-1:1;return a.localeCompare(b,"tr")});
 var el=$("plist");el.innerHTML="";clearTimeout(missT);
-if(!keys.length){el.innerHTML='<div class="empty">'+(pfil==="Takip ettiklerin"?"Henüz takip ettiğin ürün yok. Bir ürünün yanındaki yıldıza dokun.":(Object.keys(I).length?"Bu aramada ürün yok, ekibe bildirildi.":"Fiyat listesi boş."))+'</div>';if(f){var raw=$("fq").value;missT=setTimeout(function(){logMiss(raw,"malzeme")},1500)}return}
+if(!keys.length){el.innerHTML='<div class="empty">'+(pfil==="Takip ettiklerin"?"Henüz takip ettiğin ürün yok. Bir ürünün yanındaki yıldıza dokun.":(Object.keys(I).length?"Bu aramada ürün yok, ekibe bildirildi.":"Fiyat listesi boş."))+'</div>';if(f){var raw=gqv();missT=setTimeout(function(){logMiss(raw,"malzeme")},1500)}return}
 keys.forEach(function(k,ix){var d=I[k],b=best(k,false),fav=store.fav.indexOf(k)>-1,r=document.createElement("div");r.className="prow";if(ix===0)r.style.borderTop="0";
 r.innerHTML='<button class="star"></button><div><div class="nm"></div><div class="meta"></div></div><div style="text-align:right"><div class="price"></div><div class="meta"></div></div>';
 var st=r.querySelector(".star");st.textContent=fav?"★":"☆";st.setAttribute("aria-pressed",fav);st.setAttribute("aria-label",k+" takip et");
@@ -487,7 +535,7 @@ try{if(j>-1){await q(sb.from("favorites").delete().eq("ingredient",k));store.fav
 /* ---------- TARİFLER ---------- */
 function drawRecs(){var cs=["Tümü"];R.forEach(function(r){if(cs.indexOf(r.c)<0)cs.push(r.c)});var ce=$("cats");ce.innerHTML="";
 cs.forEach(function(c){var b=document.createElement("button");b.className="chip";b.textContent=c;b.setAttribute("aria-pressed",c===cat);b.onclick=function(){cat=c;openIdx=-1;drawRecs()};ce.appendChild(b)});
-var qs=$("q").value,list=matchRecs(qs,cat),el=$("results");el.innerHTML="";clearTimeout(missT);
+var qs=gqv(),list=matchRecs(qs,cat),el=$("results");el.innerHTML="";clearTimeout(missT);
 if(!list.length){el.innerHTML='<div class="empty">Bu isimde tarif yok, ekibe bildirildi. Hesapla bölümünde boş hesap başlatıp kendin oluşturabilirsin.</div>';if(qs.trim())missT=setTimeout(function(){logMiss(qs,"yemek")},1500);return}
 list.forEach(function(i){var w=document.createElement("div");w.appendChild(recRow(i,function(){openIdx=openIdx===i?-1:i;drawRecs()}));
 if(openIdx===i){var r=R[i],p=document.createElement("div");p.className="panel";
@@ -497,9 +545,10 @@ p.querySelector("button").onclick=function(){openRecipe(i)};w.appendChild(p)}
 el.appendChild(w)})}
 function drawBanner(){var el=$("banner");if((LP.seen||0)>=VER){el.innerHTML="";return}
 el.innerHTML='<div class="banner"><b>Yeni güncelleme geldi</b><p></p><button class="go" id="seen">Tamam</button></div>';
-el.querySelector("p").textContent=NEWS.r.length+" yeni yemek ("+NEWS.r.join(", ")+") ve "+NEWS.i.length+" yeni malzeme ("+NEWS.i.join(", ")+") eklendi.";
+el.querySelector("p").textContent=NEWS.text;
 el.querySelector("#seen").onclick=function(){LP.seen=VER;savePrefs();drawBanner()}}
 
+function drawProfile(){$("stShops").textContent=store.shops.length;$("stLib").textContent=store.shops.reduce(function(a,s){return a+s.recipes.length},0);$("stOwn").textContent=store.recipes.length}
 /* ---------- KÜTÜPHANE ---------- */
 function drawAlerts(){var el=$("alerts");if(!LP.lastScan||LP.dismissed===LP.lastScan){el.hidden=true;return}
 var list=[];store.shops.forEach(function(s){s.recipes.forEach(function(r,k){var c=recCost(r),pct=c.old>0?(c.pc-c.old)/c.old*100:0;if(pct>=TH)list.push({s:s,k:k,r:r,pc:c.pc,old:c.old,pct:pct})})});
@@ -512,18 +561,18 @@ b.querySelector(".nm").textContent=o.r.n;
 b.querySelector(".meta").textContent=o.s.name+" · porsiyon "+tl(o.old)+" → "+tl(o.pc)+" · önerilen fiyat "+tl(o.pc/(1-o.r.mar/100));
 b.querySelector(".rise").textContent="+%"+Math.round(o.pct);b.onclick=function(){openLib(o.s.id,o.k)};box.appendChild(b)});
 el.querySelector("#dis").onclick=function(){LP.dismissed=LP.lastScan;savePrefs();el.hidden=true}}
-function drawLib(){drawAlerts();var el=$("shops");el.innerHTML="";
+function drawLib(){drawAlerts();var el=$("shops");el.innerHTML="";var f=fold(gqv().trim());
 if(!store.shops.length){el.innerHTML='<div class="empty">Henüz işletme yok. Aşağıya işletmenin adını yazıp ekle, sonra Hesapla bölümünden yemeklerini buraya kaydet.</div>';return}
-store.shops.forEach(function(s){var b=document.createElement("button");b.className="res";b.innerHTML='<div><div class="nm"></div><div class="meta"></div></div><div class="price">›</div>';
+var shown=0;store.shops.forEach(function(s){if(f&&fold(s.name).indexOf(f)<0&&!s.recipes.some(function(r){return fold(r.n).indexOf(f)>-1}))return;shown++;var b=document.createElement("button");b.className="res";b.innerHTML='<div><div class="nm"></div><div class="meta"></div></div><div class="price">›</div>';
 b.querySelector(".nm").textContent=s.name;var rs=s.recipes.filter(function(r){return risePct(r)>=TH}).length;
 b.querySelector(".meta").textContent=s.recipes.length+" yemek"+(rs?" · "+rs+" yemekte fiyat güncellemesi gerekebilir":"");
-b.onclick=function(){curShop=s.id;go("lib")};el.appendChild(b)})}
+b.onclick=function(){curShop=s.id;$("gq").value="";go("lib")};el.appendChild(b)});if(!shown)el.innerHTML='<div class="empty">Bu aramayla eşleşen işletme ya da yemek yok.</div>'}
 function drawShop(){var s=shopById(curShop);if(!s){curShop=null;go("lib");return}
 $("shopName").textContent=s.name;$("shopRen").value=s.name;$("renRow").hidden=true;$("shopDel").textContent="İşletmeyi sil";
 $("shopMeta").textContent=s.recipes.length+" yemek · maliyetler bugünkü fiyatlarla";
 var el=$("shopRecs");el.innerHTML="";
 if(!s.recipes.length)el.innerHTML='<div class="empty">Bu işletmede henüz yemek yok. Aşağıdan yemek ekle.</div>';
-s.recipes.forEach(function(r,k){var c=recCost(r),pct=risePct(r),b=document.createElement("button");b.className="res";
+var f=fold(gqv().trim());s.recipes.forEach(function(r,k){if(f&&fold(r.n).indexOf(f)<0)return;var c=recCost(r),pct=risePct(r),b=document.createElement("button");b.className="res";
 b.innerHTML='<div><div class="nm"></div><div class="meta"></div></div><div style="text-align:right"><div class="price"></div><div class="meta"></div></div>';
 b.querySelector(".nm").textContent=r.n;if(pct>=TH)b.querySelector(".nm").insertAdjacentHTML("beforeend",'<span class="tag">6 ayda +%'+Math.round(pct)+'</span>');
 var ms=b.querySelectorAll(".meta");ms[0].textContent=r.p+" porsiyon · kaydederken "+tl(r.savedPc);
@@ -532,9 +581,10 @@ b.onclick=function(){openLib(s.id,k)};el.appendChild(b)})}
 
 /* ---------- olaylar ---------- */
 document.querySelectorAll(".bnav button").forEach(function(b){b.onclick=function(){var t=b.dataset.t;if(t==="lib"&&tab==="lib")curShop=null;go(t);window.scrollTo(0,0)}});
-$("pq").oninput=drawPick;$("q").oninput=function(){openIdx=-1;drawRecs()};$("fq").oninput=drawPrices;
-$("blank").onclick=function(){var qs=$("pq").value.trim();startCalc({n:qs?cap(qs):"Yeni hesap",p:4,it:[],src:"blank"})};
-$("calcNew").onclick=function(){calc=null;$("pq").value="";drawCalc();window.scrollTo(0,0)};
+$("gq").oninput=function(){openIdx=-1;draw()};
+$("avatar").onclick=function(){go("profile");window.scrollTo(0,0)};
+$("blank").onclick=function(){var qs=gqv().trim();startCalc({n:qs?cap(qs):"Yeni hesap",p:4,it:[],src:"blank"})};
+$("calcNew").onclick=function(){calc=null;$("gq").value="";drawCalc();window.scrollTo(0,0)};
 $("calcBack").onclick=function(){curShop=calc.lib.s;go("lib")};
 $("iq").oninput=drawSug;
 $("amtAdd").onclick=function(){var a=+$("amtIn").value;if(!pick||!a||a<=0)return;items.push({n:pick,a:a});resetAdd();drawRows()};
@@ -561,10 +611,10 @@ $("removeLib").onclick=function(){var btn=$("removeLib");confirm2(btn,function()
 busy(btn,async function(){try{await q(sb.from("shop_recipes").delete().eq("id",r.id));s.recipes.splice(calc.lib.k,1);calc=null;curShop=sid;go("lib")}catch(e){fail(e)}})})};
 $("shopAdd").onclick=function(){var btn=this;busy(btn,async function(){if(await addShop($("shopNew").value)){$("shopNew").value="";drawLib()}})};
 $("shopNew").onkeydown=function(e){if(e.key==="Enter")$("shopAdd").click()};
-$("shopBack").onclick=function(){curShop=null;go("lib")};
+$("shopBack").onclick=function(){curShop=null;$("gq").value="";go("lib")};
 $("renBtn").onclick=function(){$("renRow").hidden=!$("renRow").hidden;if(!$("renRow").hidden)$("shopRen").focus()};
 $("renSave").onclick=function(){var n=$("shopRen").value.trim(),btn=this;if(!n)return;busy(btn,async function(){try{await q(sb.from("shops").update({name:n}).eq("id",curShop));shopById(curShop).name=n;drawShop()}catch(e){fail(e)}})};
-$("shopAddRec").onclick=function(){pendingShop=curShop;calc=null;$("pq").value="";go("calc");window.scrollTo(0,0)};
+$("shopAddRec").onclick=function(){pendingShop=curShop;calc=null;go("calc");window.scrollTo(0,0)};
 $("shopDel").onclick=function(){var btn=$("shopDel");confirm2(btn,function(){busy(btn,async function(){try{await q(sb.from("shops").delete().eq("id",curShop));store.shops=store.shops.filter(function(s){return s.id!==curShop});curShop=null;go("lib")}catch(e){fail(e)}})})};
 </script>
 </body>
