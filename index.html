@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mutfak Maliyet</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0e6f68">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Maliyet">
 <style>
 :root{--bg:#eceff1;--card:#fff;--ink:#16282c;--mut:#5d7176;--line:#d3dcde;--acc:#0e6f68;--accbg:#d9eeec;--warn:#b45309;--warnbg:#fdecd2;--ok:#146c43;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10191b;--card:#182427;--ink:#e6eef0;--mut:#93a8ad;--line:#2b3c40;--acc:#4fc3b8;--accbg:#173a38;--warn:#f4b45f;--warnbg:#3b2c14;--ok:#6fd39b;color-scheme:dark}}
@@ -104,6 +110,17 @@ button:disabled{opacity:.6;cursor:wait}
 <label>Şifre<input id="aPass" type="password" autocomplete="current-password"></label>
 <button class="go wide" id="aGo">Giriş yap</button>
 <p class="note" id="aMsg"></p>
+<button class="small" id="aForgot">Şifremi unuttum</button>
+</section>
+</div>
+<div id="recoverView" hidden>
+<h1>Yeni şifre belirle</h1>
+<p class="sub">Hesabın için yeni bir şifre yaz.</p>
+<section class="card authbox">
+<label>Yeni şifre<input id="rPass" type="password" autocomplete="new-password"></label>
+<label>Yeni şifre (tekrar)<input id="rPass2" type="password" autocomplete="new-password"></label>
+<button class="go wide" id="rGo">Şifreyi kaydet</button>
+<p class="note" id="rMsg"></p>
 </section>
 </div>
 <div id="loading" class="empty">Yükleniyor…</div>
@@ -360,7 +377,9 @@ var SCAN_DAYS=90,TH=25;
 var I={},CAMP={},LIVE={},HALD=null,MS={};
 function lbl(s,n){return s==="Market"&&MS[n]?MS[n].store:s}
 var SB_URL="https://ttpajmtrpdyrowkyjdlc.supabase.co",SB_KEY="sb_publishable_g1P-Cwj5XyeQoSqzNJ0Jfg_dlCth701";
-var sb=supabase.createClient(SB_URL,SB_KEY);
+var sb=supabase.createClient(SB_URL,SB_KEY,{auth:{flowType:"implicit"}});
+var HOME=location.origin+location.pathname;
+var recovering=/type=recovery/.test(location.hash+location.search);
 var LPK="mm_prefs",LP={};try{LP=JSON.parse(localStorage.getItem(LPK))||{}}catch(e){}
 LP.sel=LP.sel||{"Hâl":true,"Metro":true,"Market":false};delete LP.sel["Pazar"];var sel=LP.sel;
 function savePrefs(){try{localStorage.setItem(LPK,JSON.stringify(LP))}catch(e){}}
@@ -401,10 +420,16 @@ $("aIn").onclick=function(){setMode("in")};$("aUp").onclick=function(){setMode("
 $("aGo").onclick=function(){var e=$("aEmail").value.trim(),p=$("aPass").value;if(!e||!p){$("aMsg").textContent="E-posta ve şifreni yaz.";return}
 busy($("aGo"),async function(){var r;
 if(aMode==="in"){r=await sb.auth.signInWithPassword({email:e,password:p});if(r.error)$("aMsg").textContent=trErr(r.error)}
-else{r=await sb.auth.signUp({email:e,password:p});if(r.error)$("aMsg").textContent=trErr(r.error);else if(!r.data.session){$("aMsg").textContent="Kayıt alındı. E-postana gelen onay linkine tıkla, sonra buradan giriş yap.";setMode("in")}}})};
+else{r=await sb.auth.signUp({email:e,password:p,options:{emailRedirectTo:HOME}});if(r.error)$("aMsg").textContent=trErr(r.error);else if(!r.data.session){$("aMsg").textContent="Kayıt alındı. E-postana gelen onay linkine tıkla, sonra buradan giriş yap.";setMode("in")}}})};
 $("aPass").onkeydown=function(e){if(e.key==="Enter")$("aGo").click()};
-function showAuth(){$("app").hidden=true;$("bnav").hidden=true;$("loading").hidden=true;$("authView").hidden=false}
-sb.auth.onAuthStateChange(function(ev,s){var u=s&&s.user;
+function showAuth(){$("app").hidden=true;$("bnav").hidden=true;$("loading").hidden=true;$("recoverView").hidden=true;$("authView").hidden=false}
+function showRecover(){recovering=true;$("app").hidden=true;$("bnav").hidden=true;$("loading").hidden=true;$("authView").hidden=true;$("recoverView").hidden=false}
+$("aForgot").onclick=function(){var e=$("aEmail").value.trim();if(!e){$("aMsg").textContent="Önce e-posta adresini yaz, sonra “Şifremi unuttum”a dokun.";$("aEmail").focus();return}
+busy($("aForgot"),async function(){var r=await sb.auth.resetPasswordForEmail(e,{redirectTo:HOME});$("aMsg").textContent=r.error?trErr(r.error):"Bu e-postayla bir hesap varsa şifre yenileme linki gönderildi. Gelen kutunu (ve gereksiz klasörünü) kontrol et."})};
+$("rGo").onclick=function(){var a=$("rPass").value,b=$("rPass2").value;if(a.length<6){$("rMsg").textContent="Şifre en az 6 karakter olmalı.";return}if(a!==b){$("rMsg").textContent="İki şifre aynı değil.";return}
+busy($("rGo"),async function(){var r=await sb.auth.updateUser({password:a});if(r.error){$("rMsg").textContent=trErr(r.error);return}
+recovering=false;history.replaceState(null,"",HOME);$("rPass").value="";$("rPass2").value="";$("recoverView").hidden=true;toast("Şifren güncellendi.");loadAll()})};
+sb.auth.onAuthStateChange(function(ev,s){var u=s&&s.user;if(ev==="PASSWORD_RECOVERY"){user=u;showRecover();return}if(recovering&&u){user=u;showRecover();return}
 if(u){if(!user||user.id!==u.id){user=u;setTimeout(loadAll,0)}}else{user=null;showAuth()}});
 $("logout").onclick=function(){sb.auth.signOut()};
 
